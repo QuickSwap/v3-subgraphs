@@ -1,0 +1,38 @@
+type Incentive @entity {
+  id: ID!
+  createdAtTimestamp: BigInt!
+  rewardToken: Bytes!
+  bonusRewardToken: Bytes!
+  pool: Bytes!
+  startTime: BigInt!
+  endTime: BigInt!
+  refundee: Bytes!
+  reward: BigInt!
+  bonusReward: BigInt!
+  ended: Boolean!
+}
+
+type Deposit @entity {
+  id: ID!
+  tokenId: BigInt!
+  L2tokenId: BigInt!
+  owner: Bytes!
+  staked: Boolean!
+  oldOwner: Bytes
+  liquidity: BigInt!
+  approved: Bytes
+  pool: Bytes!
+  incentive: Bytes
+}
+
+type L2Deposit @entity {
+  id: ID!
+  tokenId: BigInt!
+}
+
+type Reward @entity{
+  id: ID!
+  rewardAddress: Bytes!
+  amount: BigInt!
+  owner: Bytes!
+}
