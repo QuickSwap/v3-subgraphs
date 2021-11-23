@@ -11,10 +11,11 @@ import {
   Bundle,
   PoolHourData,
   TickDayData,
+  FeeHourData,
   Tick
 } from './../types/schema'
 import { FACTORY_ADDRESS } from './constants'
-import { ethereum } from '@graphprotocol/graph-ts'
+import { ethereum, BigInt } from '@graphprotocol/graph-ts'
 
 
 /**
@@ -40,7 +41,6 @@ export function updateAlgebraDayData(event: ethereum.Event): AlgebraDayData {
   algebraDayData.save()
   return algebraDayData as AlgebraDayData
 }
-
 
 
 export function updatePoolDayData(event: ethereum.Event): PoolDayData {
@@ -90,6 +90,30 @@ export function updatePoolDayData(event: ethereum.Event): PoolDayData {
   poolDayData.save()
 
   return poolDayData as PoolDayData
+}
+
+export function updateFeeHourData(event: ethereum.Event, Fee: BigInt): void{
+  let timestamp = event.block.timestamp.toI32()
+  let hourIndex = timestamp / 3600 
+  let hourStartUnix = hourIndex * 3600
+  let hourFeeID = event.address
+    .toHexString()
+    .concat('-')
+    .concat(hourIndex.toString())
+  let FeeHourDataEntity = FeeHourData.load(hourFeeID)
+  if(FeeHourDataEntity){
+    FeeHourDataEntity.timestamp = BigInt.fromI32(hourStartUnix)
+    FeeHourDataEntity.fee += Fee
+    FeeHourDataEntity.changesCount += ONE_BI
+  }
+  else{
+    FeeHourDataEntity = new FeeHourData(hourFeeID)
+    FeeHourDataEntity.timestamp = BigInt.fromI32(hourStartUnix)
+    FeeHourDataEntity.fee = Fee
+    FeeHourDataEntity.changesCount = ONE_BI
+    FeeHourDataEntity.pool = event.address.toHexString()
+  }
+  FeeHourDataEntity.save()
 }
 
 export function updatePoolHourData(event: ethereum.Event): PoolHourData {
@@ -185,6 +209,7 @@ export function updateTokenDayData(token: Token, event: ethereum.Event): TokenDa
 
   return tokenDayData as TokenDayData
 }
+
 
 export function updateTokenHourData(token: Token, event: ethereum.Event): TokenHourData {
   let bundle = Bundle.load('1')!

@@ -21,7 +21,8 @@ import {
   updateTickDayData,
   updateTokenDayData,
   updateTokenHourData,
-  updateAlgebraDayData
+  updateAlgebraDayData,
+  updateFeeHourData
 } from '../utils/intervalUpdates'
 import { createTick, feeTierToTickSpacing } from '../utils/tick'
 
@@ -516,6 +517,7 @@ export function handleChangeFee(event: ChangeFee): void {
   else{
     fee.fee = BigInt.fromI32(event.params.Fee)  
   }
+  updateFeeHourData(event, BigInt.fromI32(event.params.Fee))
   fee.save()
 }
 

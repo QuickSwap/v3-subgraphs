@@ -667,3 +667,16 @@ type TokenHourData @entity {
   # close price USD
   close: BigDecimal!
 }
+
+type FeeHourData @entity {
+  #
+  id: ID!
+  #
+  pool: String!
+  #
+  fee: BigInt!
+  #
+  changesCount: BigInt!
+  #
+  timestamp: BigInt!
+}
