@@ -679,4 +679,12 @@ type FeeHourData @entity {
   changesCount: BigInt!
   #
   timestamp: BigInt!
+  #
+  minFee: BigInt!
+  #
+  maxFee: BigInt!
+  #
+  startFee: BigInt!
+  #
+  endFee: BigInt! 
 }
