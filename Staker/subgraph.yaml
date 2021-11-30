@@ -1,0 +1,50 @@
+specVersion: 0.0.2
+description: Indexing all Polygon Block data
+repository: https://github.com/blocklytics/ethereum-blocks
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: Staker
+    network: kovan
+    source:
+      address: "0xc328313dB5dC328c723Aaf63b0d7344aDb9dF6ea"
+      abi: Staker
+      startBlock: 9289577
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - ConverterAddition
+      abis:
+        - name: Staker
+          file: ./abis/Staker.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: Entered(address,uint256,uint256)
+          handler: EnteredHandler
+        - event: Left(address,uint256,uint256)
+          handler: handleLeft
+      file: ./src/mappings/staker.ts
+  - kind: ethereum/contract
+    name: AlgbToken
+    network: kovan
+    source:
+      address: "0xb347b9f5b56b431b2cf4e1d90a5995f7519ca792"
+      abi: AlgbToken
+      startBlock: 9289577
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - ConverterAddition
+      abis:
+        - name: AlgbToken
+          file: ./abis/AlgbToken.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleALGBTransfer
+      file: ./src/mappings/staker.ts
