@@ -10,7 +10,7 @@ import  {
 } from  '../../generated/AlgbToken/AlgbToken'
 import { Stake, Factory } from '../../generated/schema';
 
-export function EnteredHandler(event: Entered): void{
+export function EnterHandler(event: Entered): void{
     let factory = Factory.load('1')
     if(factory === null){
         factory = new Factory("1")
@@ -24,13 +24,13 @@ export function EnteredHandler(event: Entered): void{
     factory.currentStakedAmount += event.params.ALGBAmount
     factory.ALGBbalance += event.params.ALGBAmount 
 
-    let entity = Stake.load(event.params.staker.toString())
+    let entity = Stake.load(event.params.staker.toHexString())
     if(entity){
         entity.stakedALGBAmount = entity.stakedALGBAmount + event.params.ALGBAmount
         entity.xALGBAmount = entity.xALGBAmount + event.params.xALGBAmount
     }
     else{
-        entity = new Stake(event.params.staker.toString())
+        entity = new Stake(event.params.staker.toHexString())
         entity.stakedALGBAmount = entity.stakedALGBAmount + event.params.ALGBAmount
         entity.xALGBAmount = entity.xALGBAmount + event.params.xALGBAmount
     }
@@ -41,13 +41,13 @@ export function EnteredHandler(event: Entered): void{
 
 export function TransferHandler(event: Transfer): void{
     
-    let from = Stake.load(event.params.from.toString())!
-    let to = Stake.load(event.params.to.toString())!
+    let from = Stake.load(event.params.from.toHexString())!
+    let to = Stake.load(event.params.to.toHexString())!
     let factory = Factory.load("1")!
     
-    if(event.params.from.toString() != ADDRESS_ZERO && event.params.to.toString() != ADDRESS_ZERO ){    
+    if(event.params.from.toHexString() != ADDRESS_ZERO && event.params.to.toHexString() != ADDRESS_ZERO ){    
         if(to === null){
-            to = new Stake(event.params.to.toString())
+            to = new Stake(event.params.to.toHexString())
         }
         let userALGBamount = from.xALGBAmount * (factory.ALGBbalance / factory.xALGBminted)
         let ALGBtransfered = userALGBamount * (event.params.value / from.xALGBAmount) 
@@ -62,7 +62,7 @@ export function TransferHandler(event: Transfer): void{
             to.xALGBAmount += event.params.value
         }
         else{
-            to = new Stake(event.params.to.toString())
+            to = new Stake(event.params.to.toHexString())
             to.stakedALGBAmount = ALGBtransfered 
             to.xALGBAmount = event.params.value
         }   
@@ -72,7 +72,7 @@ export function TransferHandler(event: Transfer): void{
 }
  
 export function LeftHandler(event: Left): void{
-    let entity = Stake.load(event.params.staker.toString())
+    let entity = Stake.load(event.params.staker.toHexString())
     let factory = Factory.load("1")
 
     if(entity){
@@ -96,7 +96,7 @@ export function LeftHandler(event: Left): void{
 }
 
 export function handleALGBTransfer(event: AlgebraTransfer): void{
-    if(event.params.from.toString() != ADDRESS_ZERO && event.params.to.toString() != ADDRESS_ZERO ){
+    if(event.params.from.toHexString() != ADDRESS_ZERO && event.params.to.toHexString() != ADDRESS_ZERO ){
         let factory = Factory.load('1')
         if(factory === null){
             factory = new Factory("1")
@@ -106,10 +106,10 @@ export function handleALGBTransfer(event: AlgebraTransfer): void{
             factory.xALGBminted = ZERO_BI 
             factory.ALGBfromVault = ZERO_BI
         }
-        if(event.params.to.toString() == stakerAddress){
+        if(event.params.to.toHexString() == stakerAddress){
             factory.ALGBbalance += event.params.value
         }
-        if(event.params.to.toString() == stakerAddress && event.params.from.toString() == vaultAddress){
+        if(event.params.to.toHexString() == stakerAddress && event.params.from.toHexString() == vaultAddress){
             factory.ALGBfromVault += event.params.value
         } 
         factory.save()

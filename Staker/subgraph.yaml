@@ -6,11 +6,11 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: Staker
-    network: kovan
+    network: matic
     source:
-      address: "0xc328313dB5dC328c723Aaf63b0d7344aDb9dF6ea"
+      address: "0x89975BF6A3a4dE71b1D6D503F49a1ef087F08d43"
       abi: Staker
-      startBlock: 9289577
+      startBlock: 20818600
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -22,19 +22,19 @@ dataSources:
           file: ./abis/Staker.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
+          handler: TransferHandler
         - event: Entered(address,uint256,uint256)
-          handler: EnteredHandler
+          handler: EnterHandler
         - event: Left(address,uint256,uint256)
-          handler: handleLeft
+          handler: LeftHandler
       file: ./src/mappings/staker.ts
   - kind: ethereum/contract
     name: AlgbToken
-    network: kovan
+    network: matic
     source:
-      address: "0xb347b9f5b56b431b2cf4e1d90a5995f7519ca792"
+      address: "0x4259Abc22981480D81075b0E8C4Bb0b142be8EF8"
       abi: AlgbToken
-      startBlock: 9289577
+      startBlock: 20818600
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
