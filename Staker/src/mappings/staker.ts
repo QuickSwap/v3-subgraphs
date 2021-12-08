@@ -8,7 +8,8 @@ import {
 import  {
     Transfer as AlgebraTransfer    
 } from  '../../generated/AlgbToken/AlgbToken'
-import { Stake, Factory } from '../../generated/schema';
+import { Stake, Factory, History } from '../../generated/schema';
+import { log } from '@graphprotocol/graph-ts'
 
 export function EnterHandler(event: Entered): void{
     let factory = Factory.load('1')
@@ -17,40 +18,59 @@ export function EnterHandler(event: Entered): void{
         factory.ALGBbalance = ZERO_BI
         factory.currentStakedAmount = ZERO_BI
         factory.earnedForAllTime = ZERO_BI
-        factory.xALGBminted = ZERO_BI 
+        factory.xALGBtotalSupply = ZERO_BI 
         factory.ALGBfromVault = ZERO_BI
+        factory.xALGBminted = ZERO_BI
     }
-    factory.xALGBminted += event.params.xALGBAmount
+    factory.xALGBtotalSupply += event.params.xALGBAmount
     factory.currentStakedAmount += event.params.ALGBAmount
-    factory.ALGBbalance += event.params.ALGBAmount 
+    factory.xALGBminted += event.params.xALGBAmount
 
     let entity = Stake.load(event.params.staker.toHexString())
     if(entity){
-        entity.stakedALGBAmount = entity.stakedALGBAmount + event.params.ALGBAmount
+        entity.stakedALGBAmount = entity.stakedALGBAmount + (event.params.xALGBAmount * factory.ALGBbalance) / factory.xALGBtotalSupply  
         entity.xALGBAmount = entity.xALGBAmount + event.params.xALGBAmount
     }
     else{
         entity = new Stake(event.params.staker.toHexString())
-        entity.stakedALGBAmount = entity.stakedALGBAmount + event.params.ALGBAmount
+        entity.stakedALGBAmount = (event.params.xALGBAmount * factory.ALGBbalance) / factory.xALGBtotalSupply
         entity.xALGBAmount = entity.xALGBAmount + event.params.xALGBAmount
     }
 
+    const day = event.block.timestamp.toI32() / 86400
+    let history = History.load(day.toString())
+
+    if(history){
+        history.currentStakedAmount += event.params.ALGBAmount
+        history.xALGBtotalSupply = factory.xALGBtotalSupply 
+        history.xALGBminted += event.params.xALGBAmount
+        history.ALGBbalance = factory.ALGBbalance
+    }
+    else{
+        history = new History(day.toString())
+        history.date = event.block.timestamp
+        history.currentStakedAmount = event.params.ALGBAmount
+        history.earned = ZERO_BI
+        history.ALGBbalance = factory.ALGBbalance
+        history.xALGBtotalSupply = factory.xALGBtotalSupply 
+        history.xALGBminted = event.params.xALGBAmount
+        history.ALGBfromVault = ZERO_BI
+    }
+
     entity.save()
-    factory.save() 
+    factory.save()
+    history.save() 
 }
 
 export function TransferHandler(event: Transfer): void{
-    
-    let from = Stake.load(event.params.from.toHexString())!
-    let to = Stake.load(event.params.to.toHexString())!
-    let factory = Factory.load("1")!
-    
-    if(event.params.from.toHexString() != ADDRESS_ZERO && event.params.to.toHexString() != ADDRESS_ZERO ){    
-        if(to === null){
-            to = new Stake(event.params.to.toHexString())
-        }
-        let userALGBamount = from.xALGBAmount * (factory.ALGBbalance / factory.xALGBminted)
-        let ALGBtransfered = userALGBamount * (event.params.value / from.xALGBAmount) 
+
+    if(event.params.from.toHexString() != ADDRESS_ZERO && event.params.to.toHexString() != ADDRESS_ZERO ){
+        let from = Stake.load(event.params.from.toHexString())!
+        let to = Stake.load(event.params.to.toHexString())
+        let factory = Factory.load("1")!
+
+        let userALGBamount = (from.xALGBAmount * factory.ALGBbalance) / factory.xALGBtotalSupply
+        let ALGBtransfered = (factory.ALGBbalance * event.params.value) / factory.xALGBtotalSupply 
         
         if(userALGBamount - ALGBtransfered < from.stakedALGBAmount){
             from.stakedALGBAmount = userALGBamount - ALGBtransfered
@@ -74,25 +94,54 @@ export function TransferHandler(event: Transfer): void{
 export function LeftHandler(event: Left): void{
     let entity = Stake.load(event.params.staker.toHexString())
     let factory = Factory.load("1")
+    let stakedDif = ZERO_BI
 
     if(entity){
-        entity.xALGBAmount -= event.params.xALGBAmount
-        let userALGBamount = entity.xALGBAmount * (factory!.ALGBbalance / factory!.xALGBminted)
-        let ALGBtransfered = userALGBamount * (event.params.ALGBAmount / entity.xALGBAmount)
+
+        let userALGBamount = (entity.xALGBAmount * factory!.ALGBbalance) / factory!.xALGBtotalSupply
+        let ALGBtransfered = (event.params.xALGBAmount * factory!.ALGBbalance) / factory!.xALGBtotalSupply
+
         if(userALGBamount - ALGBtransfered < entity.stakedALGBAmount){
-            var stakedDif = entity.stakedALGBAmount + ALGBtransfered - userALGBamount 
+            stakedDif = entity.stakedALGBAmount + ALGBtransfered - userALGBamount 
             entity.stakedALGBAmount = userALGBamount - ALGBtransfered
         }
+
+        userALGBamount = (entity.xALGBAmount * factory!.ALGBbalance) / factory!.xALGBtotalSupply
+
+        entity.xALGBAmount -= event.params.xALGBAmount
         entity.save() 
+
     }
+
     if(factory){ 
-        factory.xALGBminted -= event.params.xALGBAmount
+        factory.xALGBtotalSupply -= event.params.xALGBAmount
         factory.currentStakedAmount -= stakedDif
         factory.earnedForAllTime += event.params.ALGBAmount
         factory.ALGBbalance -= event.params.ALGBAmount
         factory.save()
     }
 
+    const day = event.block.timestamp.toI32() / 86400
+    let history = History.load(day.toString())
+    if(factory){
+        if(history){
+            history.date = event.block.timestamp
+            history.currentStakedAmount -= stakedDif
+            history.earned += event.params.ALGBAmount
+            history.ALGBbalance = factory.ALGBbalance
+            history.xALGBtotalSupply = factory.xALGBtotalSupply 
+        }
+        else{
+            history = new History(day.toString())
+            history.date = event.block.timestamp
+            history.currentStakedAmount = -stakedDif
+            history.earned = event.params.ALGBAmount
+            history.ALGBbalance = factory.ALGBbalance
+            history.xALGBtotalSupply = factory.xALGBtotalSupply
+            history.xALGBminted = event.params.xALGBAmount
+            history.ALGBfromVault = ZERO_BI 
+        }
+    }
 }
 
 export function handleALGBTransfer(event: AlgebraTransfer): void{
@@ -103,8 +152,9 @@ export function handleALGBTransfer(event: AlgebraTransfer): void{
             factory.ALGBbalance = ZERO_BI
             factory.currentStakedAmount = ZERO_BI
             factory.earnedForAllTime = ZERO_BI
-            factory.xALGBminted = ZERO_BI 
+            factory.xALGBtotalSupply = ZERO_BI 
             factory.ALGBfromVault = ZERO_BI
+            factory.xALGBminted = ZERO_BI
         }
         if(event.params.to.toHexString() == stakerAddress){
             factory.ALGBbalance += event.params.value
@@ -112,6 +162,32 @@ export function handleALGBTransfer(event: AlgebraTransfer): void{
         if(event.params.to.toHexString() == stakerAddress && event.params.from.toHexString() == vaultAddress){
             factory.ALGBfromVault += event.params.value
         } 
+
+        const day = event.block.timestamp.toI32() / 86400
+        let history = History.load(day.toString())
+
+        if(history){
+            history.ALGBbalance += factory.ALGBbalance
+            if(event.params.to.toHexString() == stakerAddress && event.params.from.toHexString() == vaultAddress){
+                history.ALGBfromVault += event.params.value
+            } 
+            history.save()
+        }
+        else{
+            if(event.params.to.toHexString() == stakerAddress && event.params.from.toHexString() == vaultAddress){
+                history = new History(day.toString())
+                history.date = event.block.timestamp
+                history.currentStakedAmount = ZERO_BI
+                history.earned = ZERO_BI
+                history.ALGBbalance = factory.ALGBbalance
+                history.xALGBtotalSupply = ZERO_BI 
+                history.xALGBminted = ZERO_BI
+                history.ALGBfromVault = event.params.value
+                history.save()   
+            }
+        }
+
+
         factory.save()
     } 
 }

@@ -3,6 +3,7 @@ type Factory @entity{
   currentStakedAmount: BigInt!
   earnedForAllTime: BigInt!
   ALGBbalance: BigInt!
+  xALGBtotalSupply: BigInt!
   xALGBminted: BigInt!
   ALGBfromVault: BigInt! 
 }
@@ -11,4 +12,15 @@ type Stake @entity{
   id: ID!
   stakedALGBAmount: BigInt!
   xALGBAmount: BigInt!
+}
+
+type History @entity{
+  id: ID!
+  date: BigInt!
+  currentStakedAmount: BigInt!
+  earned: BigInt!
+  ALGBbalance: BigInt!
+  xALGBtotalSupply: BigInt!
+  xALGBminted: BigInt!
+  ALGBfromVault: BigInt! 
 }
