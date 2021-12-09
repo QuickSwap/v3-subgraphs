@@ -8,7 +8,7 @@ dataSources:
     name: Staker
     network: matic
     source:
-      address: "0x89975BF6A3a4dE71b1D6D503F49a1ef087F08d43"
+      address: "0xfc10730039738926e8bed82578b970f1155485b0"
       abi: Staker
       startBlock: 20818600
     mapping:

@@ -7,23 +7,22 @@ type Factory @entity {
   txCount: BigInt!
   # total volume all time in derived USD
   totalVolumeUSD: BigDecimal!
-  # total volume all time in derived ETH
-  totalVolumeETH: BigDecimal!
+  # total volume all time in derived Matic
+  totalVolumeMatic: BigDecimal!
   # total swap fees all time in USD
   totalFeesUSD: BigDecimal!
   # total swap fees all time in USD
-  totalFeesETH: BigDecimal!
+  totalFeesMatic: BigDecimal!
   # all volume even through less reliable USD values
   untrackedVolumeUSD: BigDecimal!
   # TVL derived in USD
   totalValueLockedUSD: BigDecimal!
-  # TVL derived in ETH
-  totalValueLockedETH: BigDecimal!
+  # TVL derived in Matic
+  totalValueLockedMatic: BigDecimal!
   # TVL derived in USD untracked
   totalValueLockedUSDUntracked: BigDecimal!
-  # TVL derived in ETH untracked
-  totalValueLockedETHUntracked: BigDecimal!
-
+  # TVL derived in Matic untracked
+  totalValueLockedMaticUntracked: BigDecimal!
   # current owner of the factory
   owner: ID!
 }
@@ -31,8 +30,8 @@ type Factory @entity {
 # stores for USD calculations
 type Bundle @entity {
   id: ID!
-  # price of ETH in usd
-  ethPriceUSD: BigDecimal!
+  # price of Matic in usd
+  maticPriceUSD: BigDecimal!
 }
 
 type Token @entity {
@@ -64,8 +63,8 @@ type Token @entity {
   totalValueLockedUSD: BigDecimal!
   # TVL derived in USD untracked
   totalValueLockedUSDUntracked: BigDecimal!
-  # derived price in ETH
-  derivedETH: BigDecimal!
+  # derived price in Matic
+  derivedMatic: BigDecimal!
   # pools token is in that are white listed for USD pricing
   whitelistPools: [Pool!]!
   # derived fields
@@ -124,8 +123,8 @@ type Pool @entity {
   totalValueLockedToken0: BigDecimal!
   # total token 1 across all ticks
   totalValueLockedToken1: BigDecimal!
-  # tvl derived ETH
-  totalValueLockedETH: BigDecimal!
+  # tvl derived Matic
+  totalValueLockedMatic: BigDecimal!
   # tvl USD
   totalValueLockedUSD: BigDecimal!
   # TVL derived in USD untracked
@@ -442,8 +441,8 @@ type AlgebraDayData @entity {
   id: ID!
   # timestamp rounded to current day by dividing by 86400
   date: Int!
-  # total daily volume in Algebra derived in terms of ETH
-  volumeETH: BigDecimal!
+  # total daily volume in Algebra derived in terms of Matic
+  volumeMatic: BigDecimal!
   # total daily volume in Algebra derived in terms of USD
   volumeUSD: BigDecimal!
   # total daily volume in Algebra derived in terms of USD untracked

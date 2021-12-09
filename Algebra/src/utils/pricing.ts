@@ -5,17 +5,18 @@ import { BigDecimal, BigInt } from '@graphprotocol/graph-ts'
 import { exponentToBigDecimal, safeDiv } from '../utils/index'
 import { log } from '@graphprotocol/graph-ts'
 
-const WETH_ADDRESS = '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270'
-const USDC_WETH_03_POOL = '0xb413fd055cb7798feec9eea47c31dbaa614d02c7'
+const WMatic_ADDRESS = '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270'
+const USDC_WMatic_03_POOL = '0xb413fd055cb7798feec9eea47c31dbaa614d02c7'
 
 // token where amounts should contribute to tracked volume and liquidity
 // usually tokens that many tokens are paired with s
 export let WHITELIST_TOKENS: string[] = [
   '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270', // WMATIC
   '0x2791bca1f2de4661ed88a30c99a7a9449aa84174', // USDC
+  '0xc2132d05d31c914a87c6611c10748aeb04b58e8f' // USDT   
 ]
 
-let MINIMUM_ETH_LOCKED = BigDecimal.fromString('0')
+let MINIMUM_Matic_LOCKED = BigDecimal.fromString('0')
 
 let Q192 = Math.pow(2, 192)
 
@@ -33,7 +34,7 @@ export function priceToTokenPrices(price: BigInt, token0: Token, token1: Token):
 }
 
 export function getEthPriceInUSD(): BigDecimal {
-  let usdcPool = Pool.load(USDC_WETH_03_POOL) // dai is token0
+  let usdcPool = Pool.load(USDC_WMatic_03_POOL) // dai is token0
   if (usdcPool !== null) {
     return usdcPool.token1Price
   } else {
@@ -44,16 +45,16 @@ export function getEthPriceInUSD(): BigDecimal {
 
 /**
  * Search through graph to find derived Eth per token.
- * @todo update to be derived ETH (add stablecoin estimates)
+ * @todo update to be derived Matic (add stablecoin estimates)
  **/
 export function findEthPerToken(token: Token): BigDecimal {
-  if (token.id == WETH_ADDRESS) {
+  if (token.id == WMatic_ADDRESS) {
     return ONE_BD
   }
   let whiteList = token.whitelistPools
   // for now just take USD from pool with greatest TVL
   // need to update this to actually detect best rate based on liquidity distribution
-  let largestLiquidityETH = ZERO_BD
+  let largestLiquidityMatic = ZERO_BD
   let priceSoFar = ZERO_BD
   for (let i = 0; i < whiteList.length; ++i) {
     let poolAddress = whiteList[i]
@@ -62,22 +63,22 @@ export function findEthPerToken(token: Token): BigDecimal {
       if (pool.token0 == token.id) {
         // whitelist token is token1
         let token1 = Token.load(pool.token1)!
-        // get the derived ETH in pool
-        let ethLocked = pool.totalValueLockedToken1.times(token1.derivedETH)
-        if (ethLocked.gt(largestLiquidityETH) && ethLocked.gt(MINIMUM_ETH_LOCKED)) {
-          largestLiquidityETH = ethLocked
+        // get the derived Matic in pool
+        let maticLocked = pool.totalValueLockedToken1.times(token1.derivedMatic)
+        if (maticLocked.gt(largestLiquidityMatic) && maticLocked.gt(MINIMUM_Matic_LOCKED)) {
+          largestLiquidityMatic = maticLocked
           // token1 per our token * Eth per token1
-          priceSoFar = pool.token1Price.times(token1.derivedETH as BigDecimal)
+          priceSoFar = pool.token1Price.times(token1.derivedMatic as BigDecimal)
         }
       }
       if (pool.token1 == token.id) {
         let token0 = Token.load(pool.token0)!
-        // get the derived ETH in pool
-        let ethLocked = pool.totalValueLockedToken0.times(token0.derivedETH)
-        if (ethLocked.gt(largestLiquidityETH) && ethLocked.gt(MINIMUM_ETH_LOCKED)) {
-          largestLiquidityETH = ethLocked
-          // token0 per our token * ETH per token0
-          priceSoFar = pool.token0Price.times(token0.derivedETH as BigDecimal)
+        // get the derived Matic in pool
+        let maticLocked = pool.totalValueLockedToken0.times(token0.derivedMatic)
+        if (maticLocked.gt(largestLiquidityMatic) && maticLocked.gt(MINIMUM_Matic_LOCKED)) {
+          largestLiquidityMatic = maticLocked
+          // token0 per our token * Matic per token0
+          priceSoFar = pool.token0Price.times(token0.derivedMatic as BigDecimal)
         }
       }
     }
@@ -98,8 +99,8 @@ export function getTrackedAmountUSD(
   token1: Token
 ): BigDecimal {
   let bundle = Bundle.load('1')!
-  let price0USD = token0.derivedETH.times(bundle.ethPriceUSD)
-  let price1USD = token1.derivedETH.times(bundle.ethPriceUSD)
+  let price0USD = token0.derivedMatic.times(bundle.maticPriceUSD)
+  let price1USD = token1.derivedMatic.times(bundle.maticPriceUSD)
 
   // both are whitelist tokens, return sum of both amounts
   if (WHITELIST_TOKENS.includes(token0.id) && WHITELIST_TOKENS.includes(token1.id)) {
