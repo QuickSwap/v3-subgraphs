@@ -15,6 +15,7 @@ import { log } from '@graphprotocol/graph-ts'
 
 function getPosition(event: ethereum.Event, tokenId: BigInt): Position | null {
 
+  log.warning("getPosition {}",[tokenId.toString()])
   let position = Position.load(tokenId.toString())
   if (position === null) {
     let contract = NonfungiblePositionManager.bind(event.address)
@@ -91,7 +92,7 @@ function savePositionSnapshot(position: Position, event: ethereum.Event): void {
 export function handleIncreaseLiquidity(event: IncreaseLiquidity): void {
   
   let position = getPosition(event, event.params.tokenId)
-
+  log.warning("increase {}",[event.params.tokenId.toString()])
   // position was not able to be fetched
   if (position == null) {
     return

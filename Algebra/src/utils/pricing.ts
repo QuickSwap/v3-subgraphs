@@ -6,7 +6,7 @@ import { exponentToBigDecimal, safeDiv } from '../utils/index'
 import { log } from '@graphprotocol/graph-ts'
 
 const WMatic_ADDRESS = '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270'
-const USDC_WMatic_03_POOL = '0xb413fd055cb7798feec9eea47c31dbaa614d02c7'
+const USDC_WMatic_03_POOL = '0xc3c4074fbc2d504fb8ccd28e3ae46914a1ecc5ed'
 
 // token where amounts should contribute to tracked volume and liquidity
 // usually tokens that many tokens are paired with s
@@ -19,6 +19,11 @@ export let WHITELIST_TOKENS: string[] = [
 let MINIMUM_Matic_LOCKED = BigDecimal.fromString('0')
 
 let Q192 = Math.pow(2, 192)
+
+let STABLE_COINS: string[] = [
+  '0x2791bca1f2de4661ed88a30c99a7a9449aa84174', // USDC
+  '0xc2132d05d31c914a87c6611c10748aeb04b58e8f' // SUDT
+]
 
 
 export function priceToTokenPrices(price: BigInt, token0: Token, token1: Token): BigDecimal[] {
@@ -56,6 +61,13 @@ export function findEthPerToken(token: Token): BigDecimal {
   // need to update this to actually detect best rate based on liquidity distribution
   let largestLiquidityMatic = ZERO_BD
   let priceSoFar = ZERO_BD
+  let bundle = Bundle.load('1')
+
+  // hardcoded fix for incorrect rates
+  // if whitelist includes token - get the safe price
+  if (STABLE_COINS.includes(token.id)) {
+    priceSoFar = safeDiv(ONE_BD, bundle!.maticPriceUSD)
+  } else {
   for (let i = 0; i < whiteList.length; ++i) {
     let poolAddress = whiteList[i]
     let pool = Pool.load(poolAddress)!
@@ -83,6 +95,7 @@ export function findEthPerToken(token: Token): BigDecimal {
       }
     }
   }
+}
   return priceSoFar // nothing was found return 0
 }
 

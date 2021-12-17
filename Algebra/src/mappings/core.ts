@@ -305,8 +305,8 @@ export function handleSwap(event: SwapEvent): void {
   let amountTotalMaticTracked = safeDiv(amountTotalUSDTracked, bundle.maticPriceUSD)
   let amountTotalUSDUntracked = amount0USD.plus(amount1USD).div(BigDecimal.fromString('2'))
 
-  let feesMatic = amountTotalMaticTracked.times(pool.feeTier.toBigDecimal()).div(BigDecimal.fromString('1000000'))
-  let feesUSD = amountTotalUSDTracked.times(pool.feeTier.toBigDecimal()).div(BigDecimal.fromString('1000000'))
+  let feesMatic = amountTotalMaticTracked.times(pool.fee.toBigDecimal()).div(BigDecimal.fromString('1000000'))
+  let feesUSD = amountTotalUSDTracked.times(pool.fee.toBigDecimal()).div(BigDecimal.fromString('1000000'))
 
   // global updates
   factory.txCount = factory.txCount.plus(ONE_BI)
@@ -451,6 +451,7 @@ export function handleSwap(event: SwapEvent): void {
   token0DayData.save()
   token1DayData.save()
   algebraDayData.save()
+  poolHourData.save()
   poolDayData.save()
   factory.save()
   pool.save()

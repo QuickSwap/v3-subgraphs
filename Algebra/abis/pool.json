@@ -185,18 +185,6 @@
           "internalType": "address",
           "name": "virtualPoolAddress",
           "type": "address"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint32",
-          "name": "endTimestamp",
-          "type": "uint32"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint32",
-          "name": "startTimestamp",
-          "type": "uint32"
         }
       ],
       "name": "IncentiveSet",
@@ -356,18 +344,8 @@
       "outputs": [
         {
           "internalType": "address",
-          "name": "virtualPool",
+          "name": "",
           "type": "address"
-        },
-        {
-          "internalType": "uint32",
-          "name": "endTimestamp",
-          "type": "uint32"
-        },
-        {
-          "internalType": "uint32",
-          "name": "startTimestamp",
-          "type": "uint32"
         }
       ],
       "stateMutability": "view",
@@ -649,6 +627,19 @@
     },
     {
       "inputs": [],
+      "name": "liquidityCooldown",
+      "outputs": [
+        {
+          "internalType": "uint32",
+          "name": "",
+          "type": "uint32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
       "name": "maxLiquidityPerTick",
       "outputs": [
         {
@@ -730,6 +721,11 @@
           "type": "uint128"
         },
         {
+          "internalType": "uint32",
+          "name": "lastModificationTimestamp",
+          "type": "uint32"
+        },
+        {
           "internalType": "uint256",
           "name": "innerFeeGrowth0Token",
           "type": "uint256"
@@ -777,19 +773,22 @@
           "internalType": "address",
           "name": "virtualPoolAddress",
           "type": "address"
-        },
-        {
-          "internalType": "uint32",
-          "name": "endTimestamp",
-          "type": "uint32"
-        },
-        {
-          "internalType": "uint32",
-          "name": "startTimestamp",
-          "type": "uint32"
         }
       ],
       "name": "setIncentive",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint32",
+          "name": "newLiquidityCooldown",
+          "type": "uint32"
+        }
+      ],
+      "name": "setLiquidityCooldown",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -1004,14 +1003,19 @@
           "type": "uint160"
         },
         {
-          "internalType": "uint112",
+          "internalType": "uint88",
           "name": "volatilityCumulative",
-          "type": "uint112"
+          "type": "uint88"
         },
         {
-          "internalType": "uint256",
-          "name": "volumePerAvgLiquidity",
-          "type": "uint256"
+          "internalType": "int24",
+          "name": "averageTick",
+          "type": "int24"
+        },
+        {
+          "internalType": "uint144",
+          "name": "volumePerLiquidityCumulative",
+          "type": "uint144"
         }
       ],
       "stateMutability": "view",
