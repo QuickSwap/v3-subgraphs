@@ -1,4 +1,3 @@
-/* eslint-disable prefer-const */
 import {
   Collect,
   IncreaseLiquidity,
@@ -9,10 +8,11 @@ import {
 } from '../types/NonfungiblePositionManager/NonfungiblePositionManager'
 import {  Deposit } from '../types/schema'
 import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts'
-import { log } from '@graphprotocol/graph-ts'
+
 
 export function handleIncreaseLiquidity(event: IncreaseLiquidity): void {
   let entity = Deposit.load(event.params.tokenId.toHex());
+
   if (entity == null) {
     entity = new Deposit(event.params.tokenId.toHex());
     entity.approved = null;
