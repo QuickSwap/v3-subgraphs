@@ -41,11 +41,11 @@ export function priceToTokenPrices(price: BigInt, token0: Token, token1: Token):
 export function getEthPriceInUSD(): BigDecimal {
   let usdcPool = Pool.load(USDC_WMatic_03_POOL) // dai is token0
   if (usdcPool !== null) {
-    return usdcPool.token1Price
+    return usdcPool.token0Price
   } else {
     return ZERO_BD
   }
-}
+} 
 
 
 /**
@@ -56,6 +56,9 @@ export function findEthPerToken(token: Token): BigDecimal {
   if (token.id == WMatic_ADDRESS) {
     return ONE_BD
   }
+  let flag = false 
+  if( token.id == "0x0169ec1f8f639b32eec6d923e24c2a2ff45b9dd6")
+    flag = true
   let whiteList = token.whitelistPools
   // for now just take USD from pool with greatest TVL
   // need to update this to actually detect best rate based on liquidity distribution
@@ -72,6 +75,8 @@ export function findEthPerToken(token: Token): BigDecimal {
     let poolAddress = whiteList[i]
     let pool = Pool.load(poolAddress)!
     if (pool.liquidity.gt(ZERO_BI)) {
+      if(flag)
+        log.warning("check {} {}",[i.toString(),pool.id])
       if (pool.token0 == token.id) {
         // whitelist token is token1
         let token1 = Token.load(pool.token1)!
@@ -79,6 +84,8 @@ export function findEthPerToken(token: Token): BigDecimal {
         let maticLocked = pool.totalValueLockedToken1.times(token1.derivedMatic)
         if (maticLocked.gt(largestLiquidityMatic) && maticLocked.gt(MINIMUM_Matic_LOCKED)) {
           largestLiquidityMatic = maticLocked
+          if(flag)
+            log.warning("token0, maticLocked: {}",[maticLocked.toString()])
           // token1 per our token * Eth per token1
           priceSoFar = pool.token1Price.times(token1.derivedMatic as BigDecimal)
         }
@@ -89,6 +96,8 @@ export function findEthPerToken(token: Token): BigDecimal {
         let maticLocked = pool.totalValueLockedToken0.times(token0.derivedMatic)
         if (maticLocked.gt(largestLiquidityMatic) && maticLocked.gt(MINIMUM_Matic_LOCKED)) {
           largestLiquidityMatic = maticLocked
+          if(flag)
+            log.warning("token1, maticLocked: {}",[maticLocked.toString()])
           // token0 per our token * Matic per token0
           priceSoFar = pool.token0Price.times(token0.derivedMatic as BigDecimal)
         }

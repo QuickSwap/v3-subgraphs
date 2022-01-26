@@ -13,7 +13,7 @@ import {
   Swap as SwapEvent,
 } from '../types/templates/Pool/Pool'
 import { convertTokenToDecimal, loadTransaction, safeDiv } from '../utils'
-import { FACTORY_ADDRESS, ONE_BI, ZERO_BD, ZERO_BI } from '../utils/constants'
+import { FACTORY_ADDRESS, ONE_BI, ZERO_BD, ZERO_BI, pools_list } from '../utils/constants'
 import { findEthPerToken, getEthPriceInUSD, getTrackedAmountUSD, priceToTokenPrices } from '../utils/pricing'
 import {
   updatePoolDayData,
@@ -35,7 +35,7 @@ export function handleInitialize(event: Initialize): void {
   // update token prices
   let token0 = Token.load(pool.token0)!
   let token1 = Token.load(pool.token1)!
-  
+
   // update Matic price now that prices could have changed
   let bundle = Bundle.load('1')!
   bundle.maticPriceUSD = getEthPriceInUSD()
@@ -56,10 +56,19 @@ export function handleMint(event: MintEvent): void {
   let pool = Pool.load(poolAddress)!
   let factory = Factory.load(FACTORY_ADDRESS)!
 
+
   let token0 = Token.load(pool.token0)!
   let token1 = Token.load(pool.token1)!
+
   let amount0 = convertTokenToDecimal(event.params.amount0, token0.decimals)
   let amount1 = convertTokenToDecimal(event.params.amount1, token1.decimals)
+
+  if(pools_list.includes(event.address.toHexString())){
+
+    amount0 = convertTokenToDecimal(event.params.amount1, token0.decimals)
+    amount1 = convertTokenToDecimal(event.params.amount0, token1.decimals)
+  
+  }
 
   let amountUSD = amount0
     .times(token0.derivedMatic.times(bundle.maticPriceUSD))
@@ -177,8 +186,16 @@ export function handleBurn(event: BurnEvent): void {
 
   let token0 = Token.load(pool.token0)!
   let token1 = Token.load(pool.token1)!
+
   let amount0 = convertTokenToDecimal(event.params.amount0, token0.decimals)
   let amount1 = convertTokenToDecimal(event.params.amount1, token1.decimals)
+
+  if(pools_list.includes(event.address.toHexString())){
+
+    amount0 = convertTokenToDecimal(event.params.amount1, token0.decimals)
+    amount1 = convertTokenToDecimal(event.params.amount0, token1.decimals)
+  
+  }
 
   let amountUSD = amount0
     .times(token0.derivedMatic.times(bundle.maticPriceUSD))
@@ -274,14 +291,27 @@ export function handleSwap(event: SwapEvent): void {
   let factory = Factory.load(FACTORY_ADDRESS)!
   let pool = Pool.load(event.address.toHexString())!
 
+  let oldTick = pool.tick
+  let flag = false 
+
+  if(event.address.toHexString() == "0x49c1c3ac4f301ad71f788398c0de919c35eaf565"){
+    flag = true 
+  }
+
   let token0 = Token.load(pool.token0)!
   let token1 = Token.load(pool.token1)!
 
-  let oldTick = pool.tick
 
-  // amounts - 0/1 are token deltas: can be positive or negative
   let amount0 = convertTokenToDecimal(event.params.amount0, token0.decimals)
   let amount1 = convertTokenToDecimal(event.params.amount1, token1.decimals)
+
+  if(pools_list.includes(event.address.toHexString())){
+
+    amount0 = convertTokenToDecimal(event.params.amount1, token0.decimals)
+    amount1 = convertTokenToDecimal(event.params.amount0, token1.decimals)
+
+  
+  }
 
   // need absolute amounts for volume
   let amount0Abs = amount0
@@ -295,13 +325,20 @@ export function handleSwap(event: SwapEvent): void {
 
   let amount0Matic = amount0Abs.times(token0.derivedMatic)
   let amount1Matic = amount1Abs.times(token1.derivedMatic)
+  if(flag)
+    log.warning("amountMatic {} {}",[amount0Abs.times(token0.derivedMatic).toString(), amount1Abs.times(token1.derivedMatic).toString()] )
   let amount0USD = amount0Matic.times(bundle.maticPriceUSD)
   let amount1USD = amount1Matic.times(bundle.maticPriceUSD)
+    if(flag)
+    log.warning("derivedMatic {} {}, token1: {}, token0: {}",[token1.derivedMatic.toString(), token0.derivedMatic.toString(), token1.id, token0.id] )
+
+
 
   // get amount that should be tracked only - div 2 because cant count both input and output as volume
   let amountTotalUSDTracked = getTrackedAmountUSD(amount0Abs, token0 as Token, amount1Abs, token1 as Token).div(
     BigDecimal.fromString('2')
   )
+
   let amountTotalMaticTracked = safeDiv(amountTotalUSDTracked, bundle.maticPriceUSD)
   let amountTotalUSDUntracked = amount0USD.plus(amount1USD).div(BigDecimal.fromString('2'))
 
@@ -352,15 +389,26 @@ export function handleSwap(event: SwapEvent): void {
   token1.txCount = token1.txCount.plus(ONE_BI)
 
   // updated pool ratess
+ 
 
   let prices = priceToTokenPrices(pool.sqrtPrice, token0 as Token, token1 as Token)
   pool.token0Price = prices[0]
   pool.token1Price = prices[1]
+
+  if(pools_list.includes(event.address.toHexString())){
+    prices = priceToTokenPrices(pool.sqrtPrice, token1 as Token, token0 as Token)
+    pool.token0Price = prices[1]
+    pool.token1Price = prices[0]
+  }
+
+
   pool.save()
 
   // update USD pricing
   bundle.maticPriceUSD = getEthPriceInUSD()
   bundle.save()
+  if(flag)
+    log.warning("findEthPerToken {}, {}",[findEthPerToken(token0 as Token).toString(),findEthPerToken(token1 as Token).toString()])
   token0.derivedMatic = findEthPerToken(token0 as Token)
   token1.derivedMatic = findEthPerToken(token1 as Token)
 
