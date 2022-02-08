@@ -6,28 +6,35 @@ type Incentive @entity {
   pool: Bytes!
   startTime: BigInt!
   endTime: BigInt!
-  refundee: Bytes!
   reward: BigInt!
   bonusReward: BigInt!
-  ended: Boolean!
+  isDetached: Boolean
+}
+
+type EternalFarming @entity {
+  id: ID!
+  rewardToken: Bytes!
+  bonusRewardToken: Bytes!
+  virtualPool: Bytes!
+  pool: Bytes!
+  startTime: BigInt!
+  endTime: BigInt!
+  reward: BigInt!
+  bonusReward: BigInt!
+  rewardRate: BigInt!
+  bonusRewardRate: BigInt!
+  isDetached: Boolean
 }
 
 type Deposit @entity {
   id: ID!
-  tokenId: BigInt!
   L2tokenId: BigInt!
   owner: Bytes!
-  staked: Boolean!
-  oldOwner: Bytes
-  liquidity: BigInt!
-  approved: Bytes
+  onFarmingCenter: Boolean!
   pool: Bytes!
   incentive: Bytes
-}
-
-type L2Deposit @entity {
-  id: ID!
-  tokenId: BigInt!
+  eternalFarming: Bytes
+  enteredInEternalFarming: BigInt 
 }
 
 type Reward @entity{
@@ -35,4 +42,14 @@ type Reward @entity{
   rewardAddress: Bytes!
   amount: BigInt!
   owner: Bytes!
+}
+
+type Token @entity{
+  id: ID!
+  # token symbol
+  symbol: String!
+  # token name
+  name: String!
+  # token decimals
+  decimals: BigInt!
 }

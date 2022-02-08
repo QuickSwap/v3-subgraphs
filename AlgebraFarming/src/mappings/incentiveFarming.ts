@@ -1,14 +1,14 @@
 import { ethereum, Address, crypto, store, BigInt } from '@graphprotocol/graph-ts';
 import {
-  Transfer,
   IncentiveCreated,
   FarmStarted,
   FarmEnded,
-  RewardClaimed
-} from '../types/AlgebraFarming/AlgebraFarming';
-import { Incentive, Deposit, Reward, L2Deposit } from '../types/schema';
-
-const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000'
+  RewardClaimed,  
+  IncentiveDetached,
+  IncentiveAttached
+} from '../types/IncentiveFarming/IncentiveFarming';
+import { Incentive, Deposit, Reward} from '../types/schema';
+import { createTokenEntity } from '../utils/token'
 
 export function handleIncentiveCreated(event: IncentiveCreated): void {
   let incentiveIdTuple: Array<ethereum.Value> = [
@@ -16,9 +16,11 @@ export function handleIncentiveCreated(event: IncentiveCreated): void {
     ethereum.Value.fromAddress(event.params.bonusRewardToken),
     ethereum.Value.fromAddress(event.params.pool),
     ethereum.Value.fromUnsignedBigInt(event.params.startTime),
-    ethereum.Value.fromUnsignedBigInt(event.params.endTime),
-    ethereum.Value.fromAddress(event.params.refundee),
+    ethereum.Value.fromUnsignedBigInt(event.params.endTime)
   ];
+
+  createTokenEntity(event.params.rewardToken)
+  createTokenEntity(event.params.bonusRewardToken)
 
   let _incentiveTuple = changetype<ethereum.Tuple>(incentiveIdTuple);
 
@@ -40,31 +42,21 @@ export function handleIncentiveCreated(event: IncentiveCreated): void {
   entity.pool = event.params.pool;
   entity.startTime = event.params.startTime;
   entity.endTime = event.params.endTime;
-  entity.refundee = event.params.refundee;
   entity.reward += event.params.reward;
   entity.bonusReward += event.params.bonusReward;
   entity.createdAtTimestamp = event.block.timestamp;
-  entity.ended = false;
 
   entity.save();
+
 }
 
 
 export function handleTokenStaked(event: FarmStarted): void {
-  let entity = Deposit.load(event.params.tokenId.toHex());
+  let entity = Deposit.load(event.params.tokenId.toString());
   if (entity != null) {
-    entity.staked = true;
-    entity.L2tokenId = event.params.L2tokenId;
     entity.incentive = event.params.incentiveId;
-    entity.liquidity = event.params.liquidity;
     entity.save();
   }
-  let L2DepositEntity = L2Deposit.load(event.params.L2tokenId.toHexString());
-  if (L2DepositEntity == null)
-    L2DepositEntity = new L2Deposit(event.params.L2tokenId.toHexString())
-  
-  L2DepositEntity.tokenId = event.params.tokenId;
-  L2DepositEntity.save()
 }
 
 export function handleRewardClaimed(event: RewardClaimed): void {
@@ -80,15 +72,9 @@ export function handleRewardClaimed(event: RewardClaimed): void {
 
 export function handleTokenUnstaked(event: FarmEnded): void {
   
-  let entity = Deposit.load(event.params.tokenId.toHex());
-  
-  let L2DepositEntity = L2Deposit.load(entity!.L2tokenId.toHex());
-  L2DepositEntity!.tokenId = BigInt.fromString('0');
-  L2DepositEntity!.save();
+  let entity = Deposit.load(event.params.tokenId.toString());
 
   if (entity != null) {
-    entity.staked = false;
-    entity.L2tokenId = BigInt.fromString('0');
     entity.incentive = null;  
     entity.save();
   }
@@ -122,22 +108,54 @@ export function handleTokenUnstaked(event: FarmEnded): void {
 
 }
 
+export function handleDetached( event: IncentiveDetached): void{
 
-export function handleDepositTransferred(event: Transfer): void {
+  let incentiveIdTuple: Array<ethereum.Value> = [
+    ethereum.Value.fromAddress(event.params.rewardToken),
+    ethereum.Value.fromAddress(event.params.bonusRewardToken),
+    ethereum.Value.fromAddress(event.params.pool),
+    ethereum.Value.fromUnsignedBigInt(event.params.startTime),
+    ethereum.Value.fromUnsignedBigInt(event.params.endTime)
+  ];
 
+  let _incentiveTuple = changetype<ethereum.Tuple>(incentiveIdTuple);
 
-  let L2DepositEntity = L2Deposit.load(event.params.tokenId.toHexString());
-  if(L2DepositEntity == null){
-    L2DepositEntity = new L2Deposit(event.params.tokenId.toHexString());
-    L2DepositEntity.tokenId = BigInt.fromString('0');
-    L2DepositEntity.save();
-  }
-  else{
-    let entity = Deposit.load(L2DepositEntity.tokenId.toHex()); 
-    if(entity != null && event.params.to != Address.fromString(ADDRESS_ZERO) && event.params.from != Address.fromString(ADDRESS_ZERO)){
-        entity.oldOwner = event.params.to;
-        entity.save();
+  let incentiveIdEncoded = ethereum.encode(
+    ethereum.Value.fromTuple(_incentiveTuple)
+  )!;
+  let incentiveId = crypto.keccak256(incentiveIdEncoded);
 
-    }
-  }
+  let entity = Incentive.load(incentiveId.toHex());
+
+  if(entity){
+    entity.isDetached = true
+    entity.save()
+  } 
+
+}
+
+export function handleAttached( event: IncentiveAttached): void{
+
+  let incentiveIdTuple: Array<ethereum.Value> = [
+    ethereum.Value.fromAddress(event.params.rewardToken),
+    ethereum.Value.fromAddress(event.params.bonusRewardToken),
+    ethereum.Value.fromAddress(event.params.pool),
+    ethereum.Value.fromUnsignedBigInt(event.params.startTime),
+    ethereum.Value.fromUnsignedBigInt(event.params.endTime)
+  ];
+
+  let _incentiveTuple = changetype<ethereum.Tuple>(incentiveIdTuple);
+
+  let incentiveIdEncoded = ethereum.encode(
+    ethereum.Value.fromTuple(_incentiveTuple)
+  )!;
+  let incentiveId = crypto.keccak256(incentiveIdEncoded);
+
+  let entity = Incentive.load(incentiveId.toHex());
+
+  if(entity){
+    entity.isDetached = false
+    entity.save()
+  } 
+
 }
