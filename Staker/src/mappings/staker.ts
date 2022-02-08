@@ -1,5 +1,5 @@
 import { ethereum, Address, crypto, store, BigInt, BigDecimal } from '@graphprotocol/graph-ts';
-import { ZERO_BI, stakerAddress, vaultAddress, ADDRESS_ZERO } from './utils/constants'
+import { ZERO_BI, stakerAddress, vaultAddress, ADDRESS_ZERO, oldVaultAddress } from './utils/constants'
 import {
     Entered,
     Left,
@@ -8,7 +8,7 @@ import {
 import  {
     Transfer as AlgebraTransfer    
 } from  '../../generated/AlgbToken/AlgbToken'
-import { Stake, Factory, History } from '../../generated/schema';
+import { Stake, Factory, History, StakeTx } from '../../generated/schema';
 import { log } from '@graphprotocol/graph-ts'
 
 export function EnterHandler(event: Entered): void{
@@ -50,13 +50,31 @@ export function EnterHandler(event: Entered): void{
         history = new History(day.toString())
         history.date = event.block.timestamp
         history.currentStakedAmount = event.params.ALGBAmount
-        history.earned = ZERO_BI
         history.ALGBbalance = factory.ALGBbalance
         history.xALGBtotalSupply = factory.xALGBtotalSupply 
         history.xALGBminted = event.params.xALGBAmount
         history.ALGBfromVault = ZERO_BI
     }
 
+    let stake = StakeTx.load(event.block.timestamp.toString() + "-" + event.params.staker.toHexString())
+
+    if(stake === null) {
+
+        stake = new StakeTx(event.block.timestamp.toString() + "-" + event.params.staker.toHexString())
+        stake.timestamp = event.block.timestamp.toI32() + 1800
+        stake.owner = event.params.staker.toHexString()
+        stake.stakedALGBAmount = (event.params.xALGBAmount * factory.ALGBbalance) / factory.xALGBtotalSupply
+        stake.xALGBAmount = event.params.xALGBAmount
+    
+    }
+    else {
+
+        stake.stakedALGBAmount += (event.params.xALGBAmount * factory.ALGBbalance) / factory.xALGBtotalSupply
+        stake.xALGBAmount += event.params.xALGBAmount
+
+    }
+
+    stake.save()
     entity.save()
     factory.save()
     history.save() 
@@ -126,22 +144,24 @@ export function LeftHandler(event: Left): void{
     if(factory){
         if(history){
             history.date = event.block.timestamp
-            history.currentStakedAmount -= stakedDif
-            history.earned += event.params.ALGBAmount
             history.ALGBbalance = factory.ALGBbalance
             history.xALGBtotalSupply = factory.xALGBtotalSupply 
+            history.xALGBburned += event.params.xALGBAmount
+            history.save()
         }
         else{
             history = new History(day.toString())
             history.date = event.block.timestamp
-            history.currentStakedAmount = -stakedDif
-            history.earned = event.params.ALGBAmount
             history.ALGBbalance = factory.ALGBbalance
             history.xALGBtotalSupply = factory.xALGBtotalSupply
             history.xALGBminted = event.params.xALGBAmount
+            history.xALGBburned = event.params.xALGBAmount
             history.ALGBfromVault = ZERO_BI 
+            history.save()
         }
     }
+
+
 }
 
 export function handleALGBTransfer(event: AlgebraTransfer): void{
@@ -159,26 +179,26 @@ export function handleALGBTransfer(event: AlgebraTransfer): void{
         if(event.params.to.toHexString() == stakerAddress){
             factory.ALGBbalance += event.params.value
         }
-        if(event.params.to.toHexString() == stakerAddress && event.params.from.toHexString() == vaultAddress){
+        if(event.params.to.toHexString() == stakerAddress && (event.params.from.toHexString() == vaultAddress || event.params.from.toHexString() == oldVaultAddress)){
             factory.ALGBfromVault += event.params.value
         } 
+
 
         const day = event.block.timestamp.toI32() / 86400
         let history = History.load(day.toString())
 
         if(history){
-            history.ALGBbalance += factory.ALGBbalance
-            if(event.params.to.toHexString() == stakerAddress && event.params.from.toHexString() == vaultAddress){
+            history.ALGBbalance = factory.ALGBbalance
+            if(event.params.to.toHexString() == stakerAddress && (event.params.from.toHexString() == vaultAddress || event.params.from.toHexString() == oldVaultAddress) ){
                 history.ALGBfromVault += event.params.value
             } 
             history.save()
         }
         else{
-            if(event.params.to.toHexString() == stakerAddress && event.params.from.toHexString() == vaultAddress){
+            if(event.params.to.toHexString() == stakerAddress && (event.params.from.toHexString() == vaultAddress || event.params.from.toHexString() == oldVaultAddress)){
                 history = new History(day.toString())
                 history.date = event.block.timestamp
                 history.currentStakedAmount = ZERO_BI
-                history.earned = ZERO_BI
                 history.ALGBbalance = factory.ALGBbalance
                 history.xALGBtotalSupply = ZERO_BI 
                 history.xALGBminted = ZERO_BI

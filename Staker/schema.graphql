@@ -14,13 +14,21 @@ type Stake @entity{
   xALGBAmount: BigInt!
 }
 
+type StakeTx @entity{
+  id: ID!
+  timestamp: Int!
+  owner: String
+  stakedALGBAmount: BigInt!
+  xALGBAmount: BigInt!
+}
+
 type History @entity{
   id: ID!
   date: BigInt!
   currentStakedAmount: BigInt!
-  earned: BigInt!
   ALGBbalance: BigInt!
   xALGBtotalSupply: BigInt!
   xALGBminted: BigInt!
+  xALGBburned: BigInt!
   ALGBfromVault: BigInt! 
 }
