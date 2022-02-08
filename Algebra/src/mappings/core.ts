@@ -1,4 +1,3 @@
-
 /* eslint-disable prefer-const */
 import { Bundle, Burn, Factory, Mint, Pool, Swap, Tick, Token,PoolFeeData } from '../types/schema'
 import { Pool as PoolABI } from '../types/Factory/Pool'
@@ -129,7 +128,7 @@ export function handleMint(event: MintEvent): void {
   mint.amountUSD = amountUSD
   mint.tickLower = BigInt.fromI32(event.params.bottomTick)
   mint.tickUpper = BigInt.fromI32(event.params.topTick)
-
+  
   // tick entities
   let lowerTickIdx = event.params.bottomTick
   let upperTickIdx = event.params.topTick
@@ -344,6 +343,8 @@ export function handleSwap(event: SwapEvent): void {
 
   let feesMatic = amountTotalMaticTracked.times(pool.fee.toBigDecimal()).div(BigDecimal.fromString('1000000'))
   let feesUSD = amountTotalUSDTracked.times(pool.fee.toBigDecimal()).div(BigDecimal.fromString('1000000'))
+  let untrackedFees = amountTotalUSDUntracked.times(pool.fee.toBigDecimal()).div(BigDecimal.fromString('1000000'))
+
 
   // global updates
   factory.txCount = factory.txCount.plus(ONE_BI)
@@ -357,12 +358,14 @@ export function handleSwap(event: SwapEvent): void {
   let currentPoolTvlMatic = pool.totalValueLockedMatic
   factory.totalValueLockedMatic = factory.totalValueLockedMatic.minus(currentPoolTvlMatic)
 
+
   // pool volume
   pool.volumeToken0 = pool.volumeToken0.plus(amount0Abs)
   pool.volumeToken1 = pool.volumeToken1.plus(amount1Abs)
   pool.volumeUSD = pool.volumeUSD.plus(amountTotalUSDTracked)
   pool.untrackedVolumeUSD = pool.untrackedVolumeUSD.plus(amountTotalUSDUntracked)
   pool.feesUSD = pool.feesUSD.plus(feesUSD)
+  pool.untrackedFeesUSD = pool.untrackedFeesUSD.plus(untrackedFees)
   pool.txCount = pool.txCount.plus(ONE_BI)
 
   // Update the pool with the new active liquidity, price, and tick.
@@ -460,16 +463,29 @@ export function handleSwap(event: SwapEvent): void {
   let token0HourData = updateTokenHourData(token0 as Token, event)
   let token1HourData = updateTokenHourData(token1 as Token, event)
 
+  if(amount0.lt(ZERO_BD)){
+    pool.feesToken1 = pool.feesToken1.plus(amount1.times(pool.fee.toBigDecimal()).div(BigDecimal.fromString('1000000')))
+    poolDayData.feesToken1 = poolDayData.feesToken1.plus(amount1.times(pool.fee.toBigDecimal()).div(BigDecimal.fromString('1000000')))
+  }
+
+  if(amount1.lt(ZERO_BD) ){
+    pool.feesToken0 = pool.feesToken0.plus(amount0.times(pool.fee.toBigDecimal()).div(BigDecimal.fromString('1000000')))
+    poolDayData.feesToken0 = poolDayData.feesToken0.plus(amount0.times(pool.fee.toBigDecimal()).div(BigDecimal.fromString('1000000')))
+  }
+
   // update volume metrics
   algebraDayData.volumeMatic = algebraDayData.volumeMatic.plus(amountTotalMaticTracked)
   algebraDayData.volumeUSD = algebraDayData.volumeUSD.plus(amountTotalUSDTracked)
   algebraDayData.feesUSD = algebraDayData.feesUSD.plus(feesUSD)
 
   poolDayData.volumeUSD = poolDayData.volumeUSD.plus(amountTotalUSDTracked)
+  poolDayData.untrackedVolumeUSD = poolDayData.untrackedVolumeUSD.plus(amountTotalUSDUntracked)
   poolDayData.volumeToken0 = poolDayData.volumeToken0.plus(amount0Abs)
   poolDayData.volumeToken1 = poolDayData.volumeToken1.plus(amount1Abs)
   poolDayData.feesUSD = poolDayData.feesUSD.plus(feesUSD)
 
+  
+  poolHourData.untrackedVolumeUSD = poolHourData.untrackedVolumeUSD.plus(amountTotalUSDUntracked)
   poolHourData.volumeUSD = poolHourData.volumeUSD.plus(amountTotalUSDTracked)
   poolHourData.volumeToken0 = poolHourData.volumeToken0.plus(amount0Abs)
   poolHourData.volumeToken1 = poolHourData.volumeToken1.plus(amount1Abs)

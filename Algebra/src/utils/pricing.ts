@@ -13,7 +13,7 @@ const USDC_WMatic_03_POOL = '0xc3c4074fbc2d504fb8ccd28e3ae46914a1ecc5ed'
 export let WHITELIST_TOKENS: string[] = [
   '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270', // WMATIC
   '0x2791bca1f2de4661ed88a30c99a7a9449aa84174', // USDC
-  '0xc2132d05d31c914a87c6611c10748aeb04b58e8f' // USDT   
+  '0xc2132d05d31c914a87c6611c10748aeb04b58e8f' // USDT 
 ]
 
 let MINIMUM_Matic_LOCKED = BigDecimal.fromString('0')

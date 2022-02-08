@@ -111,6 +111,8 @@ type Pool @entity {
   untrackedVolumeUSD: BigDecimal!
   # fees in USD
   feesUSD: BigDecimal!
+  #
+  untrackedFeesUSD: BigDecimal!
   # all time number of transactions
   txCount: BigInt!
   # all time fees collected token0
@@ -123,6 +125,8 @@ type Pool @entity {
   totalValueLockedToken0: BigDecimal!
   # total token 1 across all ticks
   totalValueLockedToken1: BigDecimal!
+  feesToken0: BigDecimal!
+  feesToken1: BigDecimal!
   # tvl derived Matic
   totalValueLockedMatic: BigDecimal!
   # tvl USD
@@ -228,6 +232,9 @@ type Position @entity {
   # vars needed for fee computation
   feeGrowthInside0LastX128: BigInt!
   feeGrowthInside1LastX128: BigInt!
+
+  token0Tvl : BigDecimal
+  token1Tvl : BigDecimal 
 }
 
 type PositionSnapshot @entity {
@@ -467,6 +474,8 @@ type PoolDayData @entity {
   liquidity: BigInt!
   # current price tracker at end of period
   sqrtPrice: BigInt!
+  #
+  untrackedVolumeUSD: BigDecimal!
   # price of token0 - derived from sqrtPrice
   token0Price: BigDecimal!
   # price of token1 - derived from sqrtPrice
@@ -479,6 +488,8 @@ type PoolDayData @entity {
   feeGrowthGlobal1X128: BigInt!
   # tvl derived in USD at end of period
   tvlUSD: BigDecimal!
+  feesToken0: BigDecimal!
+  feesToken1: BigDecimal!
   # volume in token0
   volumeToken0: BigDecimal!
   # volume in token1
@@ -543,6 +554,7 @@ type PoolHourData @entity {
   # fees in USD
   feesUSD: BigDecimal!
   # numebr of transactions during period
+  untrackedVolumeUSD: BigDecimal!
   txCount: BigInt!
   # opening price of token0
   open: BigDecimal!

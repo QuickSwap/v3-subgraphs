@@ -6,9 +6,9 @@ import {
   NonfungiblePositionManager,
   Transfer
 } from '../types/NonfungiblePositionManager/NonfungiblePositionManager'
-import { Position, PositionSnapshot, Token } from '../types/schema'
+import { Position, PositionSnapshot, Token, Tick, Pool } from '../types/schema'
 import { ADDRESS_ZERO, factoryContract, ZERO_BD, ZERO_BI, pools_list} from '../utils/constants'
-import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts'
+import { Address, BigInt, ethereum, BigDecimal } from '@graphprotocol/graph-ts'
 import { convertTokenToDecimal, loadTransaction } from '../utils'
 import { log } from '@graphprotocol/graph-ts'
 
@@ -32,8 +32,14 @@ function getPosition(event: ethereum.Event, tokenId: BigInt): Position | null {
       // The owner gets correctly updated in the Transfer handler
       position.owner = Address.fromString(ADDRESS_ZERO)
       position.pool = poolAddress.toHexString()
-      position.token0 = positionResult.value2.toHexString()
-      position.token1 = positionResult.value3.toHexString()
+      if(pools_list.includes(position.pool)){
+        position.token0 = positionResult.value3.toHexString()
+        position.token1 = positionResult.value2.toHexString()
+      }
+      else{
+        position.token0 = positionResult.value2.toHexString()
+        position.token1 = positionResult.value3.toHexString()
+      } 
       position.tickLower = position.pool.concat('#').concat(positionResult.value4.toString())
       position.tickUpper = position.pool.concat('#').concat(positionResult.value5.toString())
       position.liquidity = ZERO_BI
@@ -62,8 +68,8 @@ function updateFeeVars(position: Position, event: ethereum.Event, tokenId: BigIn
   let positionManagerContract = NonfungiblePositionManager.bind(event.address)
   let positionResult = positionManagerContract.try_positions(tokenId)
   if (!positionResult.reverted) {
-    position.feeGrowthInside0LastX128 = positionResult.value.value8
-    position.feeGrowthInside1LastX128 = positionResult.value.value9
+    position.feeGrowthInside0LastX128 = positionResult.value.value7
+    position.feeGrowthInside1LastX128 = positionResult.value.value8
   }
   return position
 }
@@ -116,20 +122,17 @@ export function handleIncreaseLiquidity(event: IncreaseLiquidity): void {
   let token0 = Token.load(position.token0)
   let token1 = Token.load(position.token1)
 
-  if(pools_list.includes(event.params.pool.toHexString())){
-    token0 = Token.load(position.token1)
-    token1 = Token.load(position.token0)
-  }  
+
 
   let amount1 = ZERO_BD
   let amount0 = ZERO_BD
 
-    if(pools_list.includes(event.params.pool.toHexString()))
+    if(pools_list.includes(position.pool))
       amount0 = convertTokenToDecimal(event.params.amount1, token0!.decimals)
     else
       amount0 = convertTokenToDecimal(event.params.amount0, token0!.decimals)
 
-    if(pools_list.includes(event.address.toHexString()))
+    if(pools_list.includes(position.pool))
       amount1 = convertTokenToDecimal(event.params.amount0, token1!.decimals)
     else
       amount1 = convertTokenToDecimal(event.params.amount1, token1!.decimals)
@@ -137,7 +140,11 @@ export function handleIncreaseLiquidity(event: IncreaseLiquidity): void {
   position.liquidity = position.liquidity.plus(event.params.liquidity)
   position.depositedToken0 = position.depositedToken0.plus(amount0)
   position.depositedToken1 = position.depositedToken1.plus(amount1)
+  
 
+  // recalculatePosition(position)
+  
+  
   position.save()
 
   savePositionSnapshot(position, event)
@@ -155,21 +162,17 @@ export function handleDecreaseLiquidity(event: DecreaseLiquidity): void {
   let token0 = Token.load(position.token0)
   let token1 = Token.load(position.token1)
 
-  if(pools_list.includes(event.address.toHexString())){
-    token0 = Token.load(position.token1)
-    token1 = Token.load(position.token0)
-  }  
 
   let amount1 = ZERO_BD
   let amount0 = ZERO_BD
 
-    if(pools_list.includes(event.address.toHexString()))
+    if(pools_list.includes(position.pool))
       amount0 = convertTokenToDecimal(event.params.amount1, token0!.decimals)
     else
       amount0 = convertTokenToDecimal(event.params.amount0, token0!.decimals)
   
 
-    if(pools_list.includes(event.address.toHexString()))
+    if(pools_list.includes(position.pool))
       amount1 = convertTokenToDecimal(event.params.amount0, token1!.decimals)
     else
       amount1 = convertTokenToDecimal(event.params.amount1, token1!.decimals)
@@ -180,6 +183,7 @@ export function handleDecreaseLiquidity(event: DecreaseLiquidity): void {
   position.withdrawnToken1 = position.withdrawnToken1.plus(amount1)
 
   position = updateFeeVars(position, event, event.params.tokenId)
+  // recalculatePosition(position)
 
   position.save()
 
@@ -203,13 +207,13 @@ export function handleCollect(event: Collect): void {
   let amount0 = ZERO_BD
 
 
-    if(pools_list.includes(event.address.toHexString()))
+    if(pools_list.includes(position.pool))
       amount0 = convertTokenToDecimal(event.params.amount1, token0!.decimals)
     else
       amount0 = convertTokenToDecimal(event.params.amount0, token0!.decimals)
   
   
-    if(pools_list.includes(event.address.toHexString()))
+    if(pools_list.includes(position.pool))
       amount1 = convertTokenToDecimal(event.params.amount0, token1!.decimals)
     else
       amount1 = convertTokenToDecimal(event.params.amount1, token1!.decimals)
@@ -222,6 +226,8 @@ export function handleCollect(event: Collect): void {
   position.collectedFeesToken1 = position.collectedToken1.minus(position.withdrawnToken1)
 
   position = updateFeeVars(position, event, event.params.tokenId)
+
+  // recalculatePosition(position)
 
   position.save()
 
@@ -244,3 +250,60 @@ export function handleTransfer(event: Transfer): void {
   
   
 }
+
+// function pow(number: BigDecimal, degree: BigDecimal ): BigDecimal{
+//   let sum = BigDecimal.fromString("1")
+
+//   if(degree.slice(-2) = ".5")
+    
+//   log.warning("after5",[])
+//   for(let i = 0;i < BigInt.fromString(degree.toString()).toI32();i++){
+//     sum = sum * number
+//   }
+//   log.warning("number {}",[number.toString()])
+//   log.warning("sum {}",[sum.toString()])
+//   return sum
+// } 
+
+// export function recalculatePosition(position: Position): void{
+
+//   let tickLower = BigDecimal.fromString(position.tickLower.slice(43))
+  
+//   let tickUpper = BigDecimal.fromString(position.tickUpper.slice(43))
+  
+//   let liquidity = BigDecimal.fromString(position.liquidity.toString())
+  
+//   let pool = Pool.load(position.pool)
+
+  
+  
+//   let currentTick = BigDecimal.fromString(pool!.tick.toString())
+
+//   let tick = BigDecimal.fromString("1.0001")
+//   let token0 = ZERO_BD
+//   let token1 = ZERO_BD
+//   let BD_1 = BigDecimal.fromString("1")
+//   let exmpl = tick * BD_1
+//   log.warning("EXMPL {}",[exmpl.toString()])
+//   let BD_2 = BigDecimal.fromString("2")
+//   log.warning("after4",[])
+//   if(BigInt.fromString(currentTick.toString()) < BigInt.fromString(tickLower.toString())){
+//     log.warning("a123",[])
+//     token0 = liquidity * (BD_1/pow(tick,(tickLower/BD_2)) - BD_1/pow(tick,(tickUpper/BD_2)))
+//     log.warning("after32",[])
+//   }
+
+//   if(currentTick >= tickLower && currentTick < tickUpper){
+//     token1 = liquidity*(pow(tick,currentTick/BD_2) - pow(tick,(tickLower/BD_2)))
+//     token0 = liquidity * (BD_1/pow(tick,(currentTick/BD_2)) - BD_1/pow(tick,(tickUpper/BD_2)))
+//   }
+
+//   if(currentTick>= tickUpper){
+//     token1 = liquidity*(pow(tick,(tickUpper/BD_2)) - pow(tick,(tickLower/BD_2)))
+//   }
+
+//   position.token0Tvl = token1
+//   position.token1Tvl = token0
+
+//   position.save()
+// }
