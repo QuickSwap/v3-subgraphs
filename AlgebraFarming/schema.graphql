@@ -35,6 +35,7 @@ type Deposit @entity {
   incentive: Bytes
   eternalFarming: Bytes
   enteredInEternalFarming: BigInt 
+  liquidity: BigInt!
 }
 
 type Reward @entity{
