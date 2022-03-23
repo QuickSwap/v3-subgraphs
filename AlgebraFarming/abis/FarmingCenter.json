@@ -1,4 +1,4 @@
- [
+[
     {
       "inputs": [
         {
@@ -14,6 +14,11 @@
         {
           "internalType": "contract INonfungiblePositionManager",
           "name": "_nonfungiblePositionManager",
+          "type": "address"
+        },
+        {
+          "internalType": "contract IERC20Minimal",
+          "name": "_algbAddress",
           "type": "address"
         }
       ],
@@ -147,6 +152,32 @@
       "type": "function"
     },
     {
+      "inputs": [],
+      "name": "WNativeToken",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "algbAddress",
+      "outputs": [
+        {
+          "internalType": "contract IERC20Minimal",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
       "inputs": [
         {
           "internalType": "address",
@@ -260,7 +291,7 @@
           "type": "tuple"
         }
       ],
-      "name": "collectFees",
+      "name": "collect",
       "outputs": [
         {
           "internalType": "uint256",
@@ -366,6 +397,11 @@
           "type": "uint256"
         },
         {
+          "internalType": "bool",
+          "name": "inLimitFarming",
+          "type": "bool"
+        },
+        {
           "internalType": "int24",
           "name": "tickLower",
           "type": "int24"
@@ -384,6 +420,11 @@
           "internalType": "address",
           "name": "owner",
           "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "algbLocked",
+          "type": "uint256"
         }
       ],
       "stateMutability": "view",
@@ -471,6 +512,11 @@
         {
           "internalType": "uint256",
           "name": "tokenId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "algbLocked",
           "type": "uint256"
         }
       ],
@@ -830,6 +876,13 @@
       "type": "function"
     },
     {
+      "inputs": [],
+      "name": "refundNativeToken",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
       "inputs": [
         {
           "internalType": "address",
@@ -933,6 +986,29 @@
         }
       ],
       "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "token",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amountMinimum",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "recipient",
+          "type": "address"
+        }
+      ],
+      "name": "sweepToken",
+      "outputs": [],
+      "stateMutability": "payable",
       "type": "function"
     },
     {
@@ -1049,8 +1125,26 @@
     {
       "inputs": [
         {
+          "internalType": "uint256",
+          "name": "amountMinimum",
+          "type": "uint256"
+        },
+        {
           "internalType": "address",
-          "name": "",
+          "name": "recipient",
+          "type": "address"
+        }
+      ],
+      "name": "unwrapWNativeToken",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "pool",
           "type": "address"
         }
       ],
@@ -1058,12 +1152,12 @@
       "outputs": [
         {
           "internalType": "address",
-          "name": "virtualPool",
+          "name": "incentiveVP",
           "type": "address"
         },
         {
           "internalType": "address",
-          "name": "eternalVirtualPool",
+          "name": "eternalVP",
           "type": "address"
         }
       ],
@@ -1092,5 +1186,9 @@
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
+    },
+    {
+      "stateMutability": "payable",
+      "type": "receive"
     }
   ]

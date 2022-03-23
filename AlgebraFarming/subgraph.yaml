@@ -129,7 +129,7 @@ dataSources:
           handler: handleIncentiveCreated
         - event: RewardClaimed(indexed address,uint256,indexed address,indexed address)
           handler: handleRewardClaimed
-        - event: FarmStarted(indexed uint256,indexed bytes32,uint128)
+        - event: FarmStarted(indexed uint256,indexed bytes32,uint128,uint256)
           handler: handleTokenStaked
         - event: FarmEnded(indexed uint256,indexed bytes32,indexed address,address,address,uint256,uint256)
           handler: handleTokenUnstaked
@@ -137,3 +137,5 @@ dataSources:
           handler: handleDetached
         - event: IncentiveAttached(indexed address,indexed address,indexed address,address,uint256,uint256)
           handler: handleAttached
+        - event: RewardsAdded(uint256,uint256,bytes32)
+          handler: handleRewardsAdded

@@ -94,6 +94,12 @@
           "internalType": "uint128",
           "name": "liquidity",
           "type": "uint128"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "algbLocked",
+          "type": "uint256"
         }
       ],
       "name": "FarmStarted",
@@ -291,6 +297,81 @@
       "type": "event"
     },
     {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "rewardAmount",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "bonusRewardAmount",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes32",
+          "name": "incentiveId",
+          "type": "bytes32"
+        }
+      ],
+      "name": "RewardsAdded",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "contract IERC20Minimal",
+              "name": "rewardToken",
+              "type": "address"
+            },
+            {
+              "internalType": "contract IERC20Minimal",
+              "name": "bonusRewardToken",
+              "type": "address"
+            },
+            {
+              "internalType": "contract IAlgebraPool",
+              "name": "pool",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "startTime",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "endTime",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct IIncentiveKey.IncentiveKey",
+          "name": "key",
+          "type": "tuple"
+        },
+        {
+          "internalType": "uint256",
+          "name": "reward",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "bonusReward",
+          "type": "uint256"
+        }
+      ],
+      "name": "addRewards",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
       "inputs": [
         {
           "components": [
@@ -436,6 +517,43 @@
           "internalType": "uint256",
           "name": "bonusReward",
           "type": "uint256"
+        },
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "algbAmountForLevel1",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "algbAmountForLevel2",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "algbAmountForLevel3",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint32",
+              "name": "level1multiplier",
+              "type": "uint32"
+            },
+            {
+              "internalType": "uint32",
+              "name": "level2multiplier",
+              "type": "uint32"
+            },
+            {
+              "internalType": "uint32",
+              "name": "level3multiplier",
+              "type": "uint32"
+            }
+          ],
+          "internalType": "struct IAlgebraIncentiveFarming.Levels",
+          "name": "levels",
+          "type": "tuple"
         }
       ],
       "name": "createIncentive",
@@ -539,6 +657,11 @@
         {
           "internalType": "uint256",
           "name": "tokenId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "algbLockedAmount",
           "type": "uint256"
         }
       ],
@@ -739,6 +862,43 @@
           "internalType": "uint224",
           "name": "totalLiquidity",
           "type": "uint224"
+        },
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "algbAmountForLevel1",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "algbAmountForLevel2",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "algbAmountForLevel3",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint32",
+              "name": "level1multiplier",
+              "type": "uint32"
+            },
+            {
+              "internalType": "uint32",
+              "name": "level2multiplier",
+              "type": "uint32"
+            },
+            {
+              "internalType": "uint32",
+              "name": "level3multiplier",
+              "type": "uint32"
+            }
+          ],
+          "internalType": "struct IAlgebraIncentiveFarming.Levels",
+          "name": "levels",
+          "type": "tuple"
         }
       ],
       "stateMutability": "view",

@@ -9,6 +9,12 @@ type Incentive @entity {
   reward: BigInt!
   bonusReward: BigInt!
   isDetached: Boolean
+  algbAmountForLevel1: BigInt!
+  algbAmountForLevel2: BigInt!
+  algbAmountForLevel3: BigInt!
+  level1multiplier: BigInt!
+  level2multiplier: BigInt!
+  Level3multiplier: BigInt!
 }
 
 type EternalFarming @entity {
@@ -36,6 +42,8 @@ type Deposit @entity {
   eternalFarming: Bytes
   enteredInEternalFarming: BigInt 
   liquidity: BigInt!
+  algbLocked: BigInt!
+  level: BigInt! 
 }
 
 type Reward @entity{
