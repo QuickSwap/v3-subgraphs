@@ -14,7 +14,7 @@ type Incentive @entity {
   algbAmountForLevel3: BigInt!
   level1multiplier: BigInt!
   level2multiplier: BigInt!
-  Level3multiplier: BigInt!
+  level3multiplier: BigInt!
 }
 
 type EternalFarming @entity {

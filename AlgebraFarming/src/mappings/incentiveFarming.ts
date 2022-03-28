@@ -10,7 +10,9 @@ import {
 } from '../types/IncentiveFarming/IncentiveFarming';
 import { Incentive, Deposit, Reward} from '../types/schema';
 import { createTokenEntity } from '../utils/token';
-import { IncentiveFarmingAddress } from '../utils/constants';
+import { IncentiveFarmingAddress, FarmingCenterAddress } from '../utils/constants';
+import { FarmingCenter } from '../types/FarmingCenter/FarmingCenter'
+import { NonfungiblePositionManager } from '../types/NonfungiblePositionManager/NonfungiblePositionManager';
 import { IncentiveFarming, IncentiveFarming__incentivesResultLevelsStruct } from '../types/IncentiveFarming/IncentiveFarming'
 
 
@@ -33,14 +35,13 @@ export function handleIncentiveCreated(event: IncentiveCreated): void {
     ethereum.Value.fromTuple(_incentiveTuple)
   )!;
   let incentiveId = crypto.keccak256(incentiveIdEncoded);
-  let res = fetchIncentiveInfo(incentiveId)
+
   let entity = Incentive.load(incentiveId.toHex()); 
   if (entity == null) {
     entity = new Incentive(incentiveId.toHex());
     entity.reward = BigInt.fromString("0");
     entity.bonusReward = BigInt.fromString("0");
   }
-  
 
   entity.rewardToken = event.params.rewardToken;
   entity.bonusRewardToken = event.params.bonusRewardToken;
@@ -50,14 +51,12 @@ export function handleIncentiveCreated(event: IncentiveCreated): void {
   entity.reward += event.params.reward;
   entity.bonusReward += event.params.bonusReward;
   entity.createdAtTimestamp = event.block.timestamp;
-  if(res){
-    entity.algbAmountForLevel1 = res.algbAmountForLevel1
-    entity.algbAmountForLevel2 = res.algbAmountForLevel2
-    entity.algbAmountForLevel3 = res.algbAmountForLevel3
-    entity.level1multiplier = res.level1multiplier
-    entity.level2multiplier = res.level2multiplier
-    entity.Level3multiplier = res.level3multiplier
-  }
+  entity.algbAmountForLevel1 = event.params.levels.algbAmountForLevel1
+  entity.algbAmountForLevel2 = event.params.levels.algbAmountForLevel2
+  entity.algbAmountForLevel3 = event.params.levels.algbAmountForLevel3
+  entity.level1multiplier = event.params.levels.level1multiplier
+  entity.level2multiplier = event.params.levels.level2multiplier
+  entity.level3multiplier = event.params.levels.level3multiplier
 
   entity.save();
 
@@ -185,27 +184,27 @@ export function addRewards( event: RewardsAdded): void{
   }
 } 
 
-function fetchIncentiveInfo(  incentiveId: ByteArray ): IncentiveFarming__incentivesResultLevelsStruct | null{
-  let contract = IncentiveFarming.bind(IncentiveFarmingAddress)
-  let incentiveParams = changetype<Bytes>(incentiveId)
-  let incentiveCall = contract.try_incentives(incentiveParams)
-  if (!incentiveCall.reverted) {
-      let incentiveResult = incentiveCall.value
-      log.warning("{}",[incentiveResult.value6.algbAmountForLevel1.toString()])
-      return incentiveResult.value6
-  }
-  return null
-}
+// function fetchIncentiveInfo(  incentiveId: ByteArray ): IncentiveFarming__incentivesResultLevelsStruct | null{
+//   let contract = IncentiveFarming.bind(IncentiveFarmingAddress)
+//   let incentiveParams = changetype<Bytes>(incentiveId)
+//   let incentiveCall = contract.try_nonfungiblePositionManager()
+//   if (!incentiveCall.reverted) {
+//       let incentiveResult = incentiveCall.value
+//       log.warning("{}",[incentiveResult.value6.algbAmountForlevel1.toString()])
+//       return incentiveResult.value6
+//   }
+//   return null
+// }
 
 function getLevel(amount: BigInt, incentiveId: string): BigInt{
   let incentive = Incentive.load(incentiveId)
   let res = BigInt.fromString("0")
   if(incentive){
-    if (incentive.algbAmountForLevel3 < amount )
+    if (incentive.algbAmountForLevel3 <= amount )
         res = BigInt.fromString("3")
-    else if (incentive.algbAmountForLevel2 < amount ) 
+    else if (incentive.algbAmountForLevel2 <= amount ) 
             res = BigInt.fromString("2")
-        else if (incentive.algbAmountForLevel1 < amount)
+        else if (incentive.algbAmountForLevel1 <= amount)
               res = BigInt.fromString("1")
   }
   return res 
