@@ -57,6 +57,7 @@ export function handleIncentiveCreated(event: IncentiveCreated): void {
   entity.level1multiplier = event.params.levels.level1multiplier
   entity.level2multiplier = event.params.levels.level2multiplier
   entity.level3multiplier = event.params.levels.level3multiplier
+  entity.multiplierToken = event.params.multiplierToken
 
   entity.save();
 
@@ -176,11 +177,12 @@ export function handleAttached( event: IncentiveAttached): void{
 
 }
 
-export function addRewards( event: RewardsAdded): void{
+export function handleRewardsAdded( event: RewardsAdded): void{
   let incentive = Incentive.load(event.params.incentiveId.toHexString())
   if(incentive){
     incentive.bonusReward += event.params.bonusRewardAmount
     incentive.reward += event.params.rewardAmount
+    incentive.save()
   }
 } 
 

@@ -236,6 +236,12 @@
         "internalType": "struct IAlgebraIncentiveFarming.Levels",
         "name": "levels",
         "type": "tuple"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "multiplierToken",
+        "type": "address"
       }
     ],
     "name": "IncentiveCreated",
@@ -592,6 +598,11 @@
         "internalType": "struct IAlgebraIncentiveFarming.Levels",
         "name": "levels",
         "type": "tuple"
+      },
+      {
+        "internalType": "address",
+        "name": "multiplierToken",
+        "type": "address"
       }
     ],
     "name": "createIncentive",
@@ -900,6 +911,11 @@
         "internalType": "uint224",
         "name": "totalLiquidity",
         "type": "uint224"
+      },
+      {
+        "internalType": "address",
+        "name": "multiplierToken",
+        "type": "address"
       },
       {
         "components": [

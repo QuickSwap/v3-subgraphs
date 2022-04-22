@@ -33,7 +33,7 @@ dataSources:
   name: EternalFarming
   network: mumbai
   source:
-      address: '0xB4F9b6b019E75CBe51af4425b2Fc12797e2Ee2a1'
+      address: '0x9ff6aB647a7FEFa9CEb7918C2B034c3ED2C3FFF6'
       abi: EternalFarming
       startBlock: 25659659
   mapping:
@@ -79,7 +79,7 @@ dataSources:
   name: FarmingCenter
   network: mumbai
   source:
-      address: '0x50FCbF85d23aF7C91f94842FeCd83d16665d27bA'
+      address: '0x5b1803B6a3Ee361dF563BB0FF11B92Ce3F16Ac4e'
       abi: FarmingCenter
       startBlock: 25659659 
   mapping:
@@ -105,7 +105,7 @@ dataSources:
   name: IncentiveFarming
   network: mumbai
   source:
-      address: '0x69D57B9D705eaD73a5d2f2476C30c55bD755cc2F'
+      address: '0xb7875b8Dc8f49c2D6BBb658905dBF88843B54Da8'
       abi: IncentiveFarming
       startBlock: 25659659
   mapping:
@@ -125,7 +125,7 @@ dataSources:
         - name: ERC20
           file: ./abis/ERC20.json
       eventHandlers:
-        - event: IncentiveCreated(indexed address,indexed address,indexed address,address,uint256,uint256,uint256,uint256,(uint256,uint256,uint256,uint32,uint32,uint32))
+        - event: IncentiveCreated(indexed address,indexed address,indexed address,address,uint256,uint256,uint256,uint256,(uint256,uint256,uint256,uint32,uint32,uint32),address)
           handler: handleIncentiveCreated
         - event: RewardClaimed(indexed address,uint256,indexed address,indexed address)
           handler: handleRewardClaimed

@@ -15,6 +15,7 @@ type Incentive @entity {
   level1multiplier: BigInt!
   level2multiplier: BigInt!
   level3multiplier: BigInt!
+  multiplierToken: Bytes!
 }
 
 type EternalFarming @entity {
