@@ -1,0 +1,5 @@
+type Stake @entity{
+  id: ID!
+  owner: String!
+  RBCAmount: BigInt!
+}

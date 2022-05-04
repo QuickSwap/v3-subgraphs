@@ -1,0 +1,30 @@
+specVersion: 0.0.2
+description: Indexing all Polygon Block data
+repository: https://github.com/blocklytics/ethereum-blocks
+schema:
+  file: schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: Staker
+    network: bsc
+    source:
+      address: "0xf8ff82A997F6265Ac11813abBF824cc32FdaeB41"
+      abi: Staker
+      startBlock: 17309156
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - ConverterAddition
+      abis:
+        - name: Staker
+          file: Staker/abis/Staker.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: transferHandler
+        - event: Stake(address,address,uint256,uint256,uint256,uint256)
+          handler: stakeHandler
+        - event: Withdraw(address,address,uint256,uint256,uint256)
+          handler: withdrawHandler
+      file: Staker/Staker.wasm

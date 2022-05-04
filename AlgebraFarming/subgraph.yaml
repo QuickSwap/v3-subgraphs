@@ -33,7 +33,7 @@ dataSources:
   name: EternalFarming
   network: matic
   source:
-      address: '0x9f47aefc64630d268c5118f9741a13b6bcae7a24'
+      address: '0x9e448afe97fc6bed274110e0e3a034cec55fbcb5'
       abi: EternalFarming
       startBlock: 27681985
   mapping:
@@ -79,7 +79,7 @@ dataSources:
   name: FarmingCenter
   network: matic
   source:
-      address: '0x11ba1642143d77ae030a38c6f07a7762b4e439b0'
+      address: '0x7060ef7374a081f9a09dbcd3f5c38b2985299044'
       abi: FarmingCenter
       startBlock: 27681985 
   mapping:
@@ -105,7 +105,7 @@ dataSources:
   name: IncentiveFarming
   network: matic
   source:
-      address: '0x5af2b584f2f48bdd71d0564fc3bf978a9199ea3c'
+      address: '0x88721ec14bb41078c65df5c85b85e50f77c04d79'
       abi: IncentiveFarming
       startBlock: 27681985
   mapping:
