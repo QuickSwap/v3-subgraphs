@@ -5,11 +5,11 @@ schema:
 dataSources:
 - kind: ethereum/contract
   name: NonfungiblePositionManager
-  network: matic
+  network: mumbai
   source:
-      address: '0x21F5F8b46621cFa77D4f296A901cDB7AfDBB6A18'
+      address: '0x3B22094a64D3D6801a27Db4e58ac0B859A4C066d'
       abi: NonfungiblePositionManager
-      startBlock: 22519017
+      startBlock: 25659659
   mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -31,11 +31,11 @@ dataSources:
           handler: handleDecreaseLiquidity
 - kind: ethereum/contract
   name: EternalFarming
-  network: matic
+  network: mumbai
   source:
-      address: '0x9e448afe97fc6bed274110e0e3a034cec55fbcb5'
+      address: '0xEF31719546d6099f00219a2B08d9aB65B0ac75bc'
       abi: EternalFarming
-      startBlock: 27681985
+      startBlock: 26447479
   mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -57,11 +57,11 @@ dataSources:
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
       eventHandlers:
-        - event: IncentiveCreated(indexed address,indexed address,indexed address,address,uint256,uint256,uint256,uint256)
+        - event: IncentiveCreated(indexed address,indexed address,indexed address,address,uint256,uint256,uint256,uint256,(uint256,uint256,uint256,uint32,uint32,uint32),address)
           handler: handleIncentiveCreated
         - event: RewardClaimed(indexed address,uint256,indexed address,indexed address)
           handler: handleRewardClaimed
-        - event: FarmStarted(indexed uint256,indexed bytes32,uint128)
+        - event: FarmStarted(indexed uint256,indexed bytes32,uint128,uint256)
           handler: handleTokenStaked
         - event: FarmEnded(indexed uint256,indexed bytes32,indexed address,address,address,uint256,uint256)
           handler: handleTokenUnstaked
@@ -77,11 +77,11 @@ dataSources:
           handler: handleCollect
 - kind: ethereum/contract
   name: FarmingCenter
-  network: matic
+  network: mumbai
   source:
-      address: '0x7060ef7374a081f9a09dbcd3f5c38b2985299044'
+      address: '0xd7e8A32aE138cDB65899aeF1875E7B6E79eB7e20'
       abi: FarmingCenter
-      startBlock: 27681985 
+      startBlock: 26447400 
   mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -103,11 +103,11 @@ dataSources:
           handler: handleTransfer
 - kind: ethereum/contract
   name: IncentiveFarming
-  network: matic
+  network: mumbai
   source:
-      address: '0x88721ec14bb41078c65df5c85b85e50f77c04d79'
+      address: '0xf026705d8F6f1d190867CdE5e48613190325cB9c'
       abi: IncentiveFarming
-      startBlock: 27681985
+      startBlock: 26447400
   mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -125,7 +125,7 @@ dataSources:
         - name: ERC20
           file: ./abis/ERC20.json
       eventHandlers:
-        - event: IncentiveCreated(indexed address,indexed address,indexed address,address,uint256,uint256,uint256,uint256,(uint256,uint256,uint256,uint32,uint32,uint32),address)
+        - event: IncentiveCreated(indexed address,indexed address,indexed address,uint256,uint256,uint256,uint256,(uint256,uint256,uint256,uint32,uint32,uint32),address,uint32)
           handler: handleIncentiveCreated
         - event: RewardClaimed(indexed address,uint256,indexed address,indexed address)
           handler: handleRewardClaimed
@@ -139,3 +139,5 @@ dataSources:
           handler: handleAttached
         - event: RewardsAdded(uint256,uint256,bytes32)
           handler: handleRewardsAdded
+        - event: RewardAmountsDecreased(uint256,uint256,bytes32)
+          handler: handleRewardAmountsDecreased

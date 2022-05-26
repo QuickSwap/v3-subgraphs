@@ -6,14 +6,11 @@ import {
   RewardClaimed,  
   IncentiveDetached,
   IncentiveAttached,
-  RewardsAdded
+  RewardsAdded,
+  RewardAmountsDecreased
 } from '../types/IncentiveFarming/IncentiveFarming';
 import { Incentive, Deposit, Reward} from '../types/schema';
 import { createTokenEntity } from '../utils/token';
-import { IncentiveFarmingAddress, FarmingCenterAddress } from '../utils/constants';
-import { FarmingCenter } from '../types/FarmingCenter/FarmingCenter'
-import { NonfungiblePositionManager } from '../types/NonfungiblePositionManager/NonfungiblePositionManager';
-import { IncentiveFarming, IncentiveFarming__incentivesResultLevelsStruct } from '../types/IncentiveFarming/IncentiveFarming'
 
 
 
@@ -51,13 +48,14 @@ export function handleIncentiveCreated(event: IncentiveCreated): void {
   entity.reward += event.params.reward;
   entity.bonusReward += event.params.bonusReward;
   entity.createdAtTimestamp = event.block.timestamp;
-  entity.algbAmountForLevel1 = event.params.levels.algbAmountForLevel1
-  entity.algbAmountForLevel2 = event.params.levels.algbAmountForLevel2
-  entity.algbAmountForLevel3 = event.params.levels.algbAmountForLevel3
+  entity.tokenAmountForLevel1 = event.params.levels.tokenAmountForLevel1
+  entity.tokenAmountForLevel2 = event.params.levels.tokenAmountForLevel2
+  entity.tokenAmountForLevel3 = event.params.levels.tokenAmountForLevel3
   entity.level1multiplier = event.params.levels.level1multiplier
   entity.level2multiplier = event.params.levels.level2multiplier
   entity.level3multiplier = event.params.levels.level3multiplier
   entity.multiplierToken = event.params.multiplierToken
+  entity.enterStartTime = event.params.enterStartTime
 
   entity.save();
 
@@ -68,8 +66,8 @@ export function handleTokenStaked(event: FarmStarted): void {
   let entity = Deposit.load(event.params.tokenId.toString());
   if (entity != null) {
     entity.incentive = event.params.incentiveId;
-    entity.algbLocked = event.params.algbLocked;
-    entity.level = getLevel(event.params.algbLocked, event.params.incentiveId.toHexString())
+    entity.tokensLockedIncentive = event.params.tokensLocked;
+    entity.levelIncentive = getLevel(event.params.tokensLocked, event.params.incentiveId.toHexString())
     entity.save();
   }
 }
@@ -91,8 +89,8 @@ export function handleTokenUnstaked(event: FarmEnded): void {
 
   if (entity != null) {
     entity.incentive = null; 
-    entity.level = BigInt.fromString("0");
-    entity.algbLocked = BigInt.fromString("0"); 
+    entity.levelIncentive = BigInt.fromString("0");
+    entity.tokensLockedIncentive = BigInt.fromString("0"); 
     entity.save();
   }
 
@@ -186,27 +184,25 @@ export function handleRewardsAdded( event: RewardsAdded): void{
   }
 } 
 
-// function fetchIncentiveInfo(  incentiveId: ByteArray ): IncentiveFarming__incentivesResultLevelsStruct | null{
-//   let contract = IncentiveFarming.bind(IncentiveFarmingAddress)
-//   let incentiveParams = changetype<Bytes>(incentiveId)
-//   let incentiveCall = contract.try_nonfungiblePositionManager()
-//   if (!incentiveCall.reverted) {
-//       let incentiveResult = incentiveCall.value
-//       log.warning("{}",[incentiveResult.value6.algbAmountForlevel1.toString()])
-//       return incentiveResult.value6
-//   }
-//   return null
-// }
+export function handleRewardAmountsDecreased( event: RewardAmountsDecreased): void {
+  let incentive = Incentive.load(event.params.incentiveId.toHexString())
+  if(incentive){
+    incentive.bonusReward -= event.params.bonusReward
+    incentive.reward -= event.params.reward
+    incentive.save()
+  }
+}
+
 
 function getLevel(amount: BigInt, incentiveId: string): BigInt{
   let incentive = Incentive.load(incentiveId)
   let res = BigInt.fromString("0")
   if(incentive){
-    if (incentive.algbAmountForLevel3 <= amount )
+    if (incentive.tokenAmountForLevel3 <= amount )
         res = BigInt.fromString("3")
-    else if (incentive.algbAmountForLevel2 <= amount ) 
+    else if (incentive.tokenAmountForLevel2 <= amount ) 
             res = BigInt.fromString("2")
-        else if (incentive.algbAmountForLevel1 <= amount)
+        else if (incentive.tokenAmountForLevel1 <= amount)
               res = BigInt.fromString("1")
   }
   return res 

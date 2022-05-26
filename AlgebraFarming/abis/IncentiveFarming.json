@@ -98,7 +98,7 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "algbLocked",
+        "name": "tokensLocked",
         "type": "uint256"
       }
     ],
@@ -171,12 +171,6 @@
       },
       {
         "indexed": false,
-        "internalType": "address",
-        "name": "virtualPool",
-        "type": "address"
-      },
-      {
-        "indexed": false,
         "internalType": "uint256",
         "name": "startTime",
         "type": "uint256"
@@ -203,17 +197,17 @@
         "components": [
           {
             "internalType": "uint256",
-            "name": "algbAmountForLevel1",
+            "name": "tokenAmountForLevel1",
             "type": "uint256"
           },
           {
             "internalType": "uint256",
-            "name": "algbAmountForLevel2",
+            "name": "tokenAmountForLevel2",
             "type": "uint256"
           },
           {
             "internalType": "uint256",
-            "name": "algbAmountForLevel3",
+            "name": "tokenAmountForLevel3",
             "type": "uint256"
           },
           {
@@ -233,7 +227,7 @@
           }
         ],
         "indexed": false,
-        "internalType": "struct IAlgebraIncentiveFarming.Levels",
+        "internalType": "struct IAlgebraFarming.Levels",
         "name": "levels",
         "type": "tuple"
       },
@@ -242,6 +236,12 @@
         "internalType": "address",
         "name": "multiplierToken",
         "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint32",
+        "name": "enterStartTime",
+        "type": "uint32"
       }
     ],
     "name": "IncentiveCreated",
@@ -307,6 +307,31 @@
       }
     ],
     "name": "IncentiveMakerChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "reward",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "bonusReward",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "incentiveId",
+        "type": "bytes32"
+      }
+    ],
+    "name": "RewardAmountsDecreased",
     "type": "event"
   },
   {
@@ -553,30 +578,20 @@
         "type": "tuple"
       },
       {
-        "internalType": "uint256",
-        "name": "reward",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "bonusReward",
-        "type": "uint256"
-      },
-      {
         "components": [
           {
             "internalType": "uint256",
-            "name": "algbAmountForLevel1",
+            "name": "tokenAmountForLevel1",
             "type": "uint256"
           },
           {
             "internalType": "uint256",
-            "name": "algbAmountForLevel2",
+            "name": "tokenAmountForLevel2",
             "type": "uint256"
           },
           {
             "internalType": "uint256",
-            "name": "algbAmountForLevel3",
+            "name": "tokenAmountForLevel3",
             "type": "uint256"
           },
           {
@@ -595,14 +610,36 @@
             "type": "uint32"
           }
         ],
-        "internalType": "struct IAlgebraIncentiveFarming.Levels",
+        "internalType": "struct IAlgebraFarming.Levels",
         "name": "levels",
         "type": "tuple"
       },
       {
-        "internalType": "address",
-        "name": "multiplierToken",
-        "type": "address"
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "reward",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "bonusReward",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "multiplierToken",
+            "type": "address"
+          },
+          {
+            "internalType": "uint32",
+            "name": "enterStartTime",
+            "type": "uint32"
+          }
+        ],
+        "internalType": "struct IAlgebraIncentiveFarming.IncentiveParams",
+        "name": "params",
+        "type": "tuple"
       }
     ],
     "name": "createIncentive",
@@ -613,6 +650,56 @@
         "type": "address"
       }
     ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "contract IERC20Minimal",
+            "name": "rewardToken",
+            "type": "address"
+          },
+          {
+            "internalType": "contract IERC20Minimal",
+            "name": "bonusRewardToken",
+            "type": "address"
+          },
+          {
+            "internalType": "contract IAlgebraPool",
+            "name": "pool",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "startTime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "endTime",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct IIncentiveKey.IncentiveKey",
+        "name": "key",
+        "type": "tuple"
+      },
+      {
+        "internalType": "uint256",
+        "name": "reward",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "bonusReward",
+        "type": "uint256"
+      }
+    ],
+    "name": "decreaseRewardsAmount",
+    "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
@@ -710,7 +797,7 @@
       },
       {
         "internalType": "uint256",
-        "name": "algbLockedAmount",
+        "name": "tokensLocked",
         "type": "uint256"
       }
     ],
@@ -921,17 +1008,17 @@
         "components": [
           {
             "internalType": "uint256",
-            "name": "algbAmountForLevel1",
+            "name": "tokenAmountForLevel1",
             "type": "uint256"
           },
           {
             "internalType": "uint256",
-            "name": "algbAmountForLevel2",
+            "name": "tokenAmountForLevel2",
             "type": "uint256"
           },
           {
             "internalType": "uint256",
-            "name": "algbAmountForLevel3",
+            "name": "tokenAmountForLevel3",
             "type": "uint256"
           },
           {
@@ -950,7 +1037,7 @@
             "type": "uint32"
           }
         ],
-        "internalType": "struct IAlgebraIncentiveFarming.Levels",
+        "internalType": "struct IAlgebraFarming.Levels",
         "name": "levels",
         "type": "tuple"
       }
