@@ -1,14 +1,18 @@
-import { ethereum, Address, crypto, store, BigInt } from '@graphprotocol/graph-ts';
+import { ethereum, crypto, Address, log, BigInt,Bytes, ByteArray } from '@graphprotocol/graph-ts';
 import {
   IncentiveCreated,
   FarmStarted,
   FarmEnded,
   RewardClaimed,  
   IncentiveDetached,
-  IncentiveAttached
+  IncentiveAttached,
+  RewardsAdded,
+  RewardAmountsDecreased
 } from '../types/IncentiveFarming/IncentiveFarming';
 import { Incentive, Deposit, Reward} from '../types/schema';
-import { createTokenEntity } from '../utils/token'
+import { createTokenEntity } from '../utils/token';
+
+
 
 export function handleIncentiveCreated(event: IncentiveCreated): void {
   let incentiveIdTuple: Array<ethereum.Value> = [
@@ -35,7 +39,6 @@ export function handleIncentiveCreated(event: IncentiveCreated): void {
     entity.reward = BigInt.fromString("0");
     entity.bonusReward = BigInt.fromString("0");
   }
-  
 
   entity.rewardToken = event.params.rewardToken;
   entity.bonusRewardToken = event.params.bonusRewardToken;
@@ -45,6 +48,14 @@ export function handleIncentiveCreated(event: IncentiveCreated): void {
   entity.reward += event.params.reward;
   entity.bonusReward += event.params.bonusReward;
   entity.createdAtTimestamp = event.block.timestamp;
+  entity.tokenAmountForLevel1 = event.params.levels.tokenAmountForLevel1
+  entity.tokenAmountForLevel2 = event.params.levels.tokenAmountForLevel2
+  entity.tokenAmountForLevel3 = event.params.levels.tokenAmountForLevel3
+  entity.level1multiplier = event.params.levels.level1multiplier
+  entity.level2multiplier = event.params.levels.level2multiplier
+  entity.level3multiplier = event.params.levels.level3multiplier
+  entity.multiplierToken = event.params.multiplierToken
+  entity.enterStartTime = event.params.enterStartTime
 
   entity.save();
 
@@ -55,6 +66,8 @@ export function handleTokenStaked(event: FarmStarted): void {
   let entity = Deposit.load(event.params.tokenId.toString());
   if (entity != null) {
     entity.incentive = event.params.incentiveId;
+    entity.tokensLockedIncentive = event.params.tokensLocked;
+    entity.levelIncentive = getLevel(event.params.tokensLocked, event.params.incentiveId.toHexString())
     entity.save();
   }
 }
@@ -75,7 +88,9 @@ export function handleTokenUnstaked(event: FarmEnded): void {
   let entity = Deposit.load(event.params.tokenId.toString());
 
   if (entity != null) {
-    entity.incentive = null;  
+    entity.incentive = null; 
+    entity.levelIncentive = BigInt.fromString("0");
+    entity.tokensLockedIncentive = BigInt.fromString("0"); 
     entity.save();
   }
 
@@ -159,3 +174,36 @@ export function handleAttached( event: IncentiveAttached): void{
   } 
 
 }
+
+export function handleRewardsAdded( event: RewardsAdded): void{
+  let incentive = Incentive.load(event.params.incentiveId.toHexString())
+  if(incentive){
+    incentive.bonusReward += event.params.bonusRewardAmount
+    incentive.reward += event.params.rewardAmount
+    incentive.save()
+  }
+} 
+
+export function handleRewardAmountsDecreased( event: RewardAmountsDecreased): void {
+  let incentive = Incentive.load(event.params.incentiveId.toHexString())
+  if(incentive){
+    incentive.bonusReward -= event.params.bonusReward
+    incentive.reward -= event.params.reward
+    incentive.save()
+  }
+}
+
+
+function getLevel(amount: BigInt, incentiveId: string): BigInt{
+  let incentive = Incentive.load(incentiveId)
+  let res = BigInt.fromString("0")
+  if(incentive){
+    if (incentive.tokenAmountForLevel3 <= amount )
+        res = BigInt.fromString("3")
+    else if (incentive.tokenAmountForLevel2 <= amount ) 
+            res = BigInt.fromString("2")
+        else if (incentive.tokenAmountForLevel1 <= amount)
+              res = BigInt.fromString("1")
+  }
+  return res 
+} 

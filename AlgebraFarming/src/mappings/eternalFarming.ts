@@ -46,7 +46,14 @@ export function handleIncentiveCreated(event: IncentiveCreated): void {
   entity.virtualPool = event.params.virtualPool;
   entity.startTime = event.params.startTime;
   entity.endTime = event.params.endTime;
-  entity.isDetached = false
+  entity.isDetached = false;
+  entity.tokenAmountForLevel1 = event.params.levels.tokenAmountForLevel1;
+  entity.tokenAmountForLevel2 = event.params.levels.tokenAmountForLevel2;
+  entity.tokenAmountForLevel3 = event.params.levels.tokenAmountForLevel3;
+  entity.level1multiplier = event.params.levels.level1multiplier;
+  entity.level2multiplier = event.params.levels.level2multiplier;
+  entity.level3multiplier = event.params.levels.level3multiplier;
+  entity.multiplierToken = event.params.multiplierToken;
   entity.save();
 }
 
@@ -56,19 +63,21 @@ export function handleTokenStaked(event: FarmStarted): void {
   if (entity != null) {
     entity.eternalFarming = event.params.incentiveId;
     entity.enteredInEternalFarming = event.block.timestamp;
+    entity.tokensLockedEternal = event.params.tokensLocked;
+    entity.levelEternal = getLevel(event.params.tokensLocked, event.params.incentiveId.toHexString())
     entity.save();
   }
 
 }
 
 export function handleRewardClaimed(event: RewardClaimed): void {
-  let id = event.params.rewardAddress.toHexString() + event.params.owner.toHexString()
-  let rewardEntity = Reward.load(id)
+  let id = event.params.rewardAddress.toHexString() + event.params.owner.toHexString();
+  let rewardEntity = Reward.load(id);
   if (rewardEntity != null){
-      rewardEntity.owner = event.params.owner
-      rewardEntity.rewardAddress = event.params.rewardAddress
-      rewardEntity.amount = rewardEntity.amount.minus(event.params.reward)
-      rewardEntity.save()
+      rewardEntity.owner = event.params.owner;
+      rewardEntity.rewardAddress = event.params.rewardAddress;
+      rewardEntity.amount = rewardEntity.amount.minus(event.params.reward);
+      rewardEntity.save();
   }
 }
 
@@ -88,6 +97,8 @@ export function handleTokenUnstaked(event: FarmEnded): void {
 
   if (entity != null) {
     entity.eternalFarming = null;  
+    entity.levelEternal = BigInt.fromString("0")
+    entity.tokensLockedEternal = BigInt.fromString("0")
     entity.save();
   }
 
@@ -232,4 +243,18 @@ export function handleCollect( event: RewardsCollected): void{
   rewardEntity.save();
 }
 }
+} 
+
+function getLevel(amount: BigInt, incentiveId: string): BigInt{
+  let incentive = EternalFarming.load(incentiveId)
+  let res = BigInt.fromString("0")
+  if(incentive){
+    if (incentive.tokenAmountForLevel3 <= amount )
+        res = BigInt.fromString("3")
+    else if (incentive.tokenAmountForLevel2 <= amount ) 
+            res = BigInt.fromString("2")
+        else if (incentive.tokenAmountForLevel1 <= amount)
+              res = BigInt.fromString("1")
+  }
+  return res 
 } 
