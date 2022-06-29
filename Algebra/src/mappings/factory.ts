@@ -2,13 +2,13 @@ import { WHITELIST_TOKENS } from './../utils/pricing'
 /* eslint-disable prefer-const */
 import { FACTORY_ADDRESS, ZERO_BI, ONE_BI, ZERO_BD, ADDRESS_ZERO, pools_list} from './../utils/constants'
 import { Factory } from '../types/schema'
-import { PoolCreated } from '../types/Factory/Factory'
+import { Pool as PoolEvent } from '../types/Factory/Factory'
 import { Pool, Token, Bundle } from '../types/schema'
 import { Pool as PoolTemplate} from '../types/templates'
 import { fetchTokenSymbol, fetchTokenName, fetchTokenTotalSupply, fetchTokenDecimals } from '../utils/token'
 import { log,BigInt } from '@graphprotocol/graph-ts'
 
-export function handlePoolCreated(event: PoolCreated): void {
+export function handlePoolCreated(event: PoolEvent): void {
   // temp fix
 
   // load factory
