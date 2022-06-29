@@ -6,7 +6,7 @@ import { PoolCreated } from '../types/Factory/Factory'
 import { Pool, Token, Bundle } from '../types/schema'
 import { Pool as PoolTemplate} from '../types/templates'
 import { fetchTokenSymbol, fetchTokenName, fetchTokenTotalSupply, fetchTokenDecimals } from '../utils/token'
-import { log,BigInt, Address } from '@graphprotocol/graph-ts'
+import { log,BigInt } from '@graphprotocol/graph-ts'
 
 export function handlePoolCreated(event: PoolCreated): void {
   // temp fix

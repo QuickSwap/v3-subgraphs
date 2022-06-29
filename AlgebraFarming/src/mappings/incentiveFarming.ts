@@ -1,4 +1,4 @@
-import { ethereum, crypto, Address, log, BigInt,Bytes, ByteArray } from '@graphprotocol/graph-ts';
+import { ethereum, crypto, BigInt} from '@graphprotocol/graph-ts';
 import {
   IncentiveCreated,
   FarmStarted,

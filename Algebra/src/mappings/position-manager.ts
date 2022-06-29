@@ -6,11 +6,11 @@ import {
   NonfungiblePositionManager,
   Transfer
 } from '../types/NonfungiblePositionManager/NonfungiblePositionManager'
-import { Position, PositionSnapshot, Token, Tick, Pool } from '../types/schema'
+import { Position, PositionSnapshot, Token} from '../types/schema'
 import { ADDRESS_ZERO, factoryContract, ZERO_BD, ZERO_BI, pools_list} from '../utils/constants'
-import { Address, BigInt, ethereum, BigDecimal } from '@graphprotocol/graph-ts'
+import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts'
 import { convertTokenToDecimal, loadTransaction } from '../utils'
-import { log } from '@graphprotocol/graph-ts'
+
 
 
 function getPosition(event: ethereum.Event, tokenId: BigInt): Position | null {
@@ -251,59 +251,3 @@ export function handleTransfer(event: Transfer): void {
   
 }
 
-// function pow(number: BigDecimal, degree: BigDecimal ): BigDecimal{
-//   let sum = BigDecimal.fromString("1")
-
-//   if(degree.slice(-2) = ".5")
-    
-//   log.warning("after5",[])
-//   for(let i = 0;i < BigInt.fromString(degree.toString()).toI32();i++){
-//     sum = sum * number
-//   }
-//   log.warning("number {}",[number.toString()])
-//   log.warning("sum {}",[sum.toString()])
-//   return sum
-// } 
-
-// export function recalculatePosition(position: Position): void{
-
-//   let tickLower = BigDecimal.fromString(position.tickLower.slice(43))
-  
-//   let tickUpper = BigDecimal.fromString(position.tickUpper.slice(43))
-  
-//   let liquidity = BigDecimal.fromString(position.liquidity.toString())
-  
-//   let pool = Pool.load(position.pool)
-
-  
-  
-//   let currentTick = BigDecimal.fromString(pool!.tick.toString())
-
-//   let tick = BigDecimal.fromString("1.0001")
-//   let token0 = ZERO_BD
-//   let token1 = ZERO_BD
-//   let BD_1 = BigDecimal.fromString("1")
-//   let exmpl = tick * BD_1
-//   log.warning("EXMPL {}",[exmpl.toString()])
-//   let BD_2 = BigDecimal.fromString("2")
-//   log.warning("after4",[])
-//   if(BigInt.fromString(currentTick.toString()) < BigInt.fromString(tickLower.toString())){
-//     log.warning("a123",[])
-//     token0 = liquidity * (BD_1/pow(tick,(tickLower/BD_2)) - BD_1/pow(tick,(tickUpper/BD_2)))
-//     log.warning("after32",[])
-//   }
-
-//   if(currentTick >= tickLower && currentTick < tickUpper){
-//     token1 = liquidity*(pow(tick,currentTick/BD_2) - pow(tick,(tickLower/BD_2)))
-//     token0 = liquidity * (BD_1/pow(tick,(currentTick/BD_2)) - BD_1/pow(tick,(tickUpper/BD_2)))
-//   }
-
-//   if(currentTick>= tickUpper){
-//     token1 = liquidity*(pow(tick,(tickUpper/BD_2)) - pow(tick,(tickLower/BD_2)))
-//   }
-
-//   position.token0Tvl = token1
-//   position.token1Tvl = token0
-
-//   position.save()
-// }

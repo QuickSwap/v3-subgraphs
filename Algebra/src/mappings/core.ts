@@ -1,11 +1,9 @@
 /* eslint-disable prefer-const */
 import { Bundle, Burn, Factory, Mint, Pool, Swap, Tick, Token,PoolFeeData } from '../types/schema'
 import { Pool as PoolABI } from '../types/Factory/Pool'
-import { BigDecimal, BigInt, ethereum, store } from '@graphprotocol/graph-ts'
-import { log } from '@graphprotocol/graph-ts'
+import { BigDecimal, BigInt, ethereum} from '@graphprotocol/graph-ts'
 import {
   Burn as BurnEvent,
-  Flash as FlashEvent,
   Initialize,
   ChangeFee,
   Mint as MintEvent,
@@ -291,11 +289,6 @@ export function handleSwap(event: SwapEvent): void {
   let pool = Pool.load(event.address.toHexString())!
 
   let oldTick = pool.tick
-  let flag = false 
-
-  if(event.address.toHexString() == "0x49c1c3ac4f301ad71f788398c0de919c35eaf565"){
-    flag = true 
-  }
 
   let token0 = Token.load(pool.token0)!
   let token1 = Token.load(pool.token1)!
@@ -309,7 +302,6 @@ export function handleSwap(event: SwapEvent): void {
     amount0 = convertTokenToDecimal(event.params.amount1, token0.decimals)
     amount1 = convertTokenToDecimal(event.params.amount0, token1.decimals)
 
-  
   }
 
   // need absolute amounts for volume
@@ -324,12 +316,9 @@ export function handleSwap(event: SwapEvent): void {
 
   let amount0Matic = amount0Abs.times(token0.derivedMatic)
   let amount1Matic = amount1Abs.times(token1.derivedMatic)
-  if(flag)
-    log.warning("amountMatic {} {}",[amount0Abs.times(token0.derivedMatic).toString(), amount1Abs.times(token1.derivedMatic).toString()] )
+
   let amount0USD = amount0Matic.times(bundle.maticPriceUSD)
   let amount1USD = amount1Matic.times(bundle.maticPriceUSD)
-    if(flag)
-    log.warning("derivedMatic {} {}, token1: {}, token0: {}",[token1.derivedMatic.toString(), token0.derivedMatic.toString(), token1.id, token0.id] )
 
 
 
@@ -410,8 +399,7 @@ export function handleSwap(event: SwapEvent): void {
   // update USD pricing
   bundle.maticPriceUSD = getEthPriceInUSD()
   bundle.save()
-  if(flag)
-    log.warning("findEthPerToken {}, {}",[findEthPerToken(token0 as Token).toString(),findEthPerToken(token1 as Token).toString()])
+
   token0.derivedMatic = findEthPerToken(token0 as Token)
   token1.derivedMatic = findEthPerToken(token1 as Token)
 

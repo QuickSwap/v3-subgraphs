@@ -10,7 +10,7 @@ import {
   RewardsAdded,
   RewardsCollected
 } from '../types/EternalFarming/EternalFarming';
-import { Incentive, Deposit, Reward, EternalFarming } from '../types/schema';
+import { Deposit, Reward, EternalFarming } from '../types/schema';
 import { createTokenEntity } from '../utils/token'
 
 export function handleIncentiveCreated(event: IncentiveCreated): void {

@@ -3,7 +3,6 @@ import { ONE_BD, ZERO_BD, ZERO_BI } from './constants'
 import { Bundle, Pool, Token } from './../types/schema'
 import { BigDecimal, BigInt } from '@graphprotocol/graph-ts'
 import { exponentToBigDecimal, safeDiv } from '../utils/index'
-import { log } from '@graphprotocol/graph-ts'
 
 const WMatic_ADDRESS = '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270'
 const USDC_WMatic_03_POOL = '0xc3c4074fbc2d504fb8ccd28e3ae46914a1ecc5ed'
@@ -56,9 +55,6 @@ export function findEthPerToken(token: Token): BigDecimal {
   if (token.id == WMatic_ADDRESS) {
     return ONE_BD
   }
-  let flag = false 
-  if( token.id == "0x0169ec1f8f639b32eec6d923e24c2a2ff45b9dd6")
-    flag = true
   let whiteList = token.whitelistPools
   // for now just take USD from pool with greatest TVL
   // need to update this to actually detect best rate based on liquidity distribution
@@ -75,8 +71,7 @@ export function findEthPerToken(token: Token): BigDecimal {
     let poolAddress = whiteList[i]
     let pool = Pool.load(poolAddress)!
     if (pool.liquidity.gt(ZERO_BI)) {
-      if(flag)
-        log.warning("check {} {}",[i.toString(),pool.id])
+
       if (pool.token0 == token.id) {
         // whitelist token is token1
         let token1 = Token.load(pool.token1)!
@@ -84,8 +79,6 @@ export function findEthPerToken(token: Token): BigDecimal {
         let maticLocked = pool.totalValueLockedToken1.times(token1.derivedMatic)
         if (maticLocked.gt(largestLiquidityMatic) && maticLocked.gt(MINIMUM_Matic_LOCKED)) {
           largestLiquidityMatic = maticLocked
-          if(flag)
-            log.warning("token0, maticLocked: {}",[maticLocked.toString()])
           // token1 per our token * Eth per token1
           priceSoFar = pool.token1Price.times(token1.derivedMatic as BigDecimal)
         }
@@ -96,8 +89,6 @@ export function findEthPerToken(token: Token): BigDecimal {
         let maticLocked = pool.totalValueLockedToken0.times(token0.derivedMatic)
         if (maticLocked.gt(largestLiquidityMatic) && maticLocked.gt(MINIMUM_Matic_LOCKED)) {
           largestLiquidityMatic = maticLocked
-          if(flag)
-            log.warning("token1, maticLocked: {}",[maticLocked.toString()])
           // token0 per our token * Matic per token0
           priceSoFar = pool.token0Price.times(token0.derivedMatic as BigDecimal)
         }

@@ -13,5 +13,5 @@ export let ONE_BD = BigDecimal.fromString('1')
 export let BI_18 = BigInt.fromI32(18)
 
 export let factoryContract = FactoryContract.bind(Address.fromString(FACTORY_ADDRESS))
-// "0x49c1c3ac4f301ad71f788398c0de919c35eaf565","0xc3c4074fbc2d504fb8ccd28e3ae46914a1ecc5ed"
-export let pools_list = ["0x49c1c3ac4f301ad71f788398c0de919c35eaf565","0xc3c4074fbc2d504fb8ccd28e3ae46914a1ecc5ed"]
+
+export let pools_list = [""]

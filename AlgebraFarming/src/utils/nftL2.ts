@@ -1,5 +1,5 @@
 import { FarmingCenter } from '../types/FarmingCenter/FarmingCenter'
-import { Address, BigInt, ethereum, log} from '@graphprotocol/graph-ts'
+import { BigInt} from '@graphprotocol/graph-ts'
 import { FarmingCenterAddress } from './constants'
 
 
@@ -10,7 +10,6 @@ import { FarmingCenterAddress } from './constants'
   let result = BigInt.fromString("0")
   if (!depositCall.reverted) {
       let depositResult = depositCall.value
-      log.warning("{}",[depositResult.value2.toString()])
       result = depositResult.value2
   }
   return result

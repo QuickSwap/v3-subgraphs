@@ -1,12 +1,10 @@
 import {
-  Collect,
   IncreaseLiquidity,
   DecreaseLiquidity,
-  NonfungiblePositionManager,
   Transfer
 } from '../types/NonfungiblePositionManager/NonfungiblePositionManager'
 import {  Deposit } from '../types/schema'
-import { Address, BigInt, ethereum, log } from '@graphprotocol/graph-ts'
+import { BigInt } from '@graphprotocol/graph-ts'
 import { FarmingCenterAddress } from '../utils/constants'
 
 
@@ -44,7 +42,6 @@ export function handleTransfer(event: Transfer): void {
   
     if (event.params.to == FarmingCenterAddress){
       entity.onFarmingCenter = true
-      log.warning("at handleTransfer before: {}, after: {}",[entity.owner.toHexString(), event.params.from.toHexString()])
       entity.owner = event.params.from;
     }
 
