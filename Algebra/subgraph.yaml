@@ -98,3 +98,5 @@ templates:
           handler: handleBurn
         - event: Fee(uint16)
           handler: handleChangeFee
+        - event: CommunityFee(uint8,uint8)
+          handler: handleSetCommunityFee

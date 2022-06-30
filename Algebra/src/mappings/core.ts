@@ -1,18 +1,19 @@
 /* eslint-disable prefer-const */
 import { Bundle, Burn, Factory, Mint, Pool, Swap, Tick, Token,PoolFeeData } from '../types/schema'
 import { Pool as PoolABI } from '../types/Factory/Pool'
-import { BigDecimal, BigInt, ethereum, store } from '@graphprotocol/graph-ts'
-import { log } from '@graphprotocol/graph-ts'
+import { BigDecimal, BigInt, ethereum} from '@graphprotocol/graph-ts'
+
 import {
   Burn as BurnEvent,
-  Flash as FlashEvent,
+  Collect,
   Initialize,
   Fee as ChangeFee,
   Mint as MintEvent,
   Swap as SwapEvent,
+  CommunityFee
 } from '../types/templates/Pool/Pool'
 import { convertTokenToDecimal, loadTransaction, safeDiv } from '../utils'
-import { FACTORY_ADDRESS, ONE_BI, ZERO_BD, ZERO_BI, pools_list } from '../utils/constants'
+import { FACTORY_ADDRESS, ONE_BI, ZERO_BD, ZERO_BI, pools_list, TICK_SPACING } from '../utils/constants'
 import { findEthPerToken, getEthPriceInUSD, getTrackedAmountUSD, priceToTokenPrices } from '../utils/pricing'
 import {
   updatePoolDayData,
@@ -23,7 +24,7 @@ import {
   updateAlgebraDayData,
   updateFeeHourData
 } from '../utils/intervalUpdates'
-import { createTick, feeTierToTickSpacing } from '../utils/tick'
+import { createTick } from '../utils/tick'
 
 export function handleInitialize(event: Initialize): void {
   let pool = Pool.load(event.address.toHexString())!
@@ -293,9 +294,6 @@ export function handleSwap(event: SwapEvent): void {
   let oldTick = pool.tick
   let flag = false 
 
-  if(event.address.toHexString() == "0x49c1c3ac4f301ad71f788398c0de919c35eaf565"){
-    flag = true 
-  }
 
   let token0 = Token.load(pool.token0)!
   let token1 = Token.load(pool.token1)!
@@ -312,24 +310,34 @@ export function handleSwap(event: SwapEvent): void {
   
   }
 
-  // need absolute amounts for volume
-  let amount0Abs = amount0
-  if (amount0.lt(ZERO_BD)) {
-    amount0Abs = amount0.times(BigDecimal.fromString('-1'))
-  }
-  let amount1Abs = amount1
-  if (amount1.lt(ZERO_BD)) {
-    amount1Abs = amount1.times(BigDecimal.fromString('-1'))
-  }
+ // need absolute amounts for volume
+ let amount0Abs = amount0
+ if (amount0.lt(ZERO_BD)) {
+   amount0Abs = amount0.times(BigDecimal.fromString('-1'))
+ }
+ else { 
+   let communityFeeAmount = amount0.times(BigDecimal.fromString((pool.fee.times(pool.communityFee0).toString())).div(BigDecimal.fromString('100000000')))
+   communityFeeAmount = communityFeeAmount.times(BigDecimal.fromString("1.0005")) 
+   amount0 = amount0.minus(communityFeeAmount)
+   amount0Abs = amount0
+ } 
+
+ let amount1Abs = amount1
+ if (amount1.lt(ZERO_BD)) {
+   amount1Abs = amount1.times(BigDecimal.fromString('-1'))
+ }
+ else{
+   let communityFeeAmount = amount1.times(BigDecimal.fromString((pool.fee.times(pool.communityFee1).toString())).div(BigDecimal.fromString('100000000')))
+   communityFeeAmount = communityFeeAmount.times(BigDecimal.fromString("1.0005"))  
+   amount1 = amount1.minus(communityFeeAmount)
+   amount1Abs = amount1
+ }
 
   let amount0Matic = amount0Abs.times(token0.derivedMatic)
   let amount1Matic = amount1Abs.times(token1.derivedMatic)
-  if(flag)
-    log.warning("amountMatic {} {}",[amount0Abs.times(token0.derivedMatic).toString(), amount1Abs.times(token1.derivedMatic).toString()] )
+
   let amount0USD = amount0Matic.times(bundle.maticPriceUSD)
   let amount1USD = amount1Matic.times(bundle.maticPriceUSD)
-    if(flag)
-    log.warning("derivedMatic {} {}, token1: {}, token0: {}",[token1.derivedMatic.toString(), token0.derivedMatic.toString(), token1.id, token0.id] )
 
 
 
@@ -410,8 +418,7 @@ export function handleSwap(event: SwapEvent): void {
   // update USD pricing
   bundle.maticPriceUSD = getEthPriceInUSD()
   bundle.save()
-  if(flag)
-    log.warning("findEthPerToken {}, {}",[findEthPerToken(token0 as Token).toString(),findEthPerToken(token1 as Token).toString()])
+
   token0.derivedMatic = findEthPerToken(token0 as Token)
   token1.derivedMatic = findEthPerToken(token1 as Token)
 
@@ -524,8 +531,7 @@ export function handleSwap(event: SwapEvent): void {
   
   // Update inner vars of current or crossed ticks
   let newTick = pool.tick
-  let tickSpacing = feeTierToTickSpacing(pool.feeTier)
-  let modulo = newTick.mod(tickSpacing)
+  let modulo = newTick.mod(TICK_SPACING)
   if (modulo.equals(ZERO_BI)) {
     // Current tick is initialized and needs to be updated
     loadTickUpdateFeeVarsAndSave(newTick.toI32(), event)
@@ -534,7 +540,7 @@ export function handleSwap(event: SwapEvent): void {
   let numIters = oldTick
     .minus(newTick)
     .abs()
-    .div(tickSpacing)
+    .div(TICK_SPACING)
 
   if (numIters.gt(BigInt.fromI32(100))) {
     // In case more than 100 ticks need to be updated ignore the update in
@@ -543,17 +549,99 @@ export function handleSwap(event: SwapEvent): void {
     // updated later. For early users this error also disappears when calling
     // collect
   } else if (newTick.gt(oldTick)) {
-    let firstInitialized = oldTick.plus(tickSpacing.minus(modulo))
-    for (let i = firstInitialized; i.le(newTick); i = i.plus(tickSpacing)) {
+    let firstInitialized = oldTick.plus(TICK_SPACING.minus(modulo))
+    for (let i = firstInitialized; i.le(newTick); i = i.plus(TICK_SPACING)) {
       loadTickUpdateFeeVarsAndSave(i.toI32(), event)
     }
   } else if (newTick.lt(oldTick)) {
     let firstInitialized = oldTick.minus(modulo)
-    for (let i = firstInitialized; i.ge(newTick); i = i.minus(tickSpacing)) {
+    for (let i = firstInitialized; i.ge(newTick); i = i.minus(TICK_SPACING)) {
       loadTickUpdateFeeVarsAndSave(i.toI32(), event)
     }
   }
 }
+
+export function handleSetCommunityFee(event: CommunityFee): void {
+  let pool = Pool.load(event.address.toHexString())
+  if (pool){
+    pool.communityFee0 = BigInt.fromI32(event.params.communityFee0New)
+    pool.communityFee1 = BigInt.fromI32(event.params.communityFee1New)
+    pool.save() 
+  }
+
+}
+
+export function handleCollect(event: Collect): void {
+  let transaction = loadTransaction(event)
+  let bundle = Bundle.load('1')!
+  let poolAddress = event.address.toHexString()
+  let pool = Pool.load(poolAddress)!
+  let factory = Factory.load(FACTORY_ADDRESS)!
+ 
+ 
+  let token0 = Token.load(pool.token0)!
+  let token1 = Token.load(pool.token1)! 
+ 
+  let amount0 = convertTokenToDecimal(event.params.amount0, token0.decimals)
+  let amount1 = convertTokenToDecimal(event.params.amount1, token1.decimals)
+ 
+  if(transaction){
+ 
+      let burn = Burn.load(transaction.id + '#' + pool.txCount.minus(ONE_BI).toString())
+      if(burn){
+        amount0 = amount0.minus(burn.amount0)
+        amount1 = amount1.minus(burn.amount1) 
+      }
+      let burn2 = Burn.load(transaction.id + '#' + pool.txCount.toString())
+      if(burn2){
+
+        amount0 = amount0.minus(burn2.amount0)
+        amount1 = amount1.minus(burn2.amount1) 
+
+      }
+  }
+ 
+  let amountUSD = amount0
+    .times(token0.derivedMatic.times(bundle.maticPriceUSD))
+    .plus(amount1.times(token1.derivedMatic.times(bundle.maticPriceUSD)))
+ 
+  // reset tvl aggregates until new amounts calculated
+  factory.totalValueLockedMatic = factory.totalValueLockedMatic.minus(pool.totalValueLockedMatic)
+ 
+  // update globals
+  factory.txCount = factory.txCount.plus(ONE_BI)
+ 
+  // update token0 data
+  token0.txCount = token0.txCount.plus(ONE_BI)
+  token0.totalValueLocked = token0.totalValueLocked.minus(amount0)
+  token0.totalValueLockedUSD = token0.totalValueLocked.times(token0.derivedMatic.times(bundle.maticPriceUSD))
+ 
+  // update token1 data
+  token1.txCount = token1.txCount.plus(ONE_BI)
+  token1.totalValueLocked = token1.totalValueLocked.minus(amount1)
+  token1.totalValueLockedUSD = token1.totalValueLocked.times(token1.derivedMatic.times(bundle.maticPriceUSD))
+ 
+  // pool data
+  pool.txCount = pool.txCount.plus(ONE_BI)
+ 
+  pool.totalValueLockedToken0 = pool.totalValueLockedToken0.minus(amount0)
+  pool.totalValueLockedToken1 = pool.totalValueLockedToken1.minus(amount1)
+  pool.totalValueLockedMatic = pool.totalValueLockedToken0
+    .times(token0.derivedMatic)
+    .plus(pool.totalValueLockedToken1.times(token1.derivedMatic))
+  pool.totalValueLockedUSD = pool.totalValueLockedMatic.times(bundle.maticPriceUSD)
+ 
+  // reset aggregates with new amounts
+  factory.totalValueLockedMatic = factory.totalValueLockedMatic.plus(pool.totalValueLockedMatic)
+  factory.totalValueLockedUSD = factory.totalValueLockedMatic.times(bundle.maticPriceUSD)
+ 
+  token0.save()
+  token1.save()
+  pool.save()
+  factory.save()
+ 
+}
+
 
 function updateTickFeeVarsAndSave(tick: Tick, event: ethereum.Event): void {
   let poolAddress = event.address

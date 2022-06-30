@@ -42,6 +42,3 @@ export function createTick(tickId: string, tickIdx: i32, poolId: string, event: 
   return tick
 }
 
-export function feeTierToTickSpacing(feeTier: BigInt): BigInt {
-    return BigInt.fromI32(60)
-}
