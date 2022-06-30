@@ -25,6 +25,7 @@ export function handleIncentiveCreated(event: IncentiveCreated): void {
 
   createTokenEntity(event.params.rewardToken)
   createTokenEntity(event.params.bonusRewardToken)
+  createTokenEntity(event.params.multiplierToken)
 
   let _incentiveTuple = changetype<ethereum.Tuple>(incentiveIdTuple);
 
