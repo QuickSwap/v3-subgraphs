@@ -15,6 +15,11 @@
         "internalType": "contract INonfungiblePositionManager",
         "name": "_nonfungiblePositionManager",
         "type": "address"
+      },
+      {
+        "internalType": "contract IFarmingCenterVault",
+        "name": "_farmingCenterVault",
+        "type": "address"
       }
     ],
     "stateMutability": "nonpayable",
@@ -354,7 +359,7 @@
       },
       {
         "internalType": "bool",
-        "name": "zeroForOne",
+        "name": "zeroToOne",
         "type": "bool"
       }
     ],
@@ -379,24 +384,9 @@
         "type": "uint256"
       },
       {
-        "internalType": "int24",
-        "name": "tickLower",
-        "type": "int24"
-      },
-      {
-        "internalType": "int24",
-        "name": "tickUpper",
-        "type": "int24"
-      },
-      {
         "internalType": "uint32",
         "name": "numberOfFarms",
         "type": "uint32"
-      },
-      {
-        "internalType": "address",
-        "name": "owner",
-        "type": "address"
       },
       {
         "internalType": "bool",
@@ -404,9 +394,9 @@
         "type": "bool"
       },
       {
-        "internalType": "uint256",
-        "name": "tokensLocked",
-        "type": "uint256"
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
       }
     ],
     "stateMutability": "view",
