@@ -353,6 +353,24 @@
   {
     "inputs": [
       {
+        "internalType": "contract IAlgebraPool",
+        "name": "pool",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "newVirtualPool",
+        "type": "address"
+      }
+    ],
+    "name": "connectVirtualPool",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "int24",
         "name": "nextTick",
         "type": "int24"
@@ -662,7 +680,7 @@
     "outputs": [
       {
         "internalType": "enum IAlgebraVirtualPool.Status",
-        "name": "",
+        "name": "status",
         "type": "uint8"
       }
     ],
@@ -860,13 +878,6 @@
   },
   {
     "inputs": [],
-    "name": "processSwap",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "refundNativeToken",
     "outputs": [],
     "stateMutability": "payable",
@@ -937,24 +948,6 @@
       }
     ],
     "name": "setApprovalForAll",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "contract IAlgebraPool",
-        "name": "pool",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "virtualPool",
-        "type": "address"
-      }
-    ],
-    "name": "setFarmingCenterAddress",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

@@ -49,12 +49,12 @@ export function handleIncentiveCreated(event: IncentiveCreated): void {
   entity.reward += event.params.reward;
   entity.bonusReward += event.params.bonusReward;
   entity.createdAtTimestamp = event.block.timestamp;
-  entity.tokenAmountForLevel1 = event.params.levels.tokenAmountForLevel1
-  entity.tokenAmountForLevel2 = event.params.levels.tokenAmountForLevel2
-  entity.tokenAmountForLevel3 = event.params.levels.tokenAmountForLevel3
-  entity.level1multiplier = event.params.levels.level1multiplier
-  entity.level2multiplier = event.params.levels.level2multiplier
-  entity.level3multiplier = event.params.levels.level3multiplier
+  entity.tokenAmountForTier1 = event.params.tiers.tokenAmountForTier1
+  entity.tokenAmountForTier2 = event.params.tiers.tokenAmountForTier2
+  entity.tokenAmountForTier3 = event.params.tiers.tokenAmountForTier3
+  entity.tier1multiplier = event.params.tiers.tier1multiplier
+  entity.tier2multiplier = event.params.tiers.tier2multiplier
+  entity.tier3multiplier = event.params.tiers.tier3multiplier
   entity.multiplierToken = event.params.multiplierToken
   entity.enterStartTime = event.params.enterStartTime
 
@@ -68,7 +68,7 @@ export function handleTokenStaked(event: FarmStarted): void {
   if (entity != null) {
     entity.incentive = event.params.incentiveId;
     entity.tokensLockedIncentive = event.params.tokensLocked;
-    entity.levelIncentive = getLevel(event.params.tokensLocked, event.params.incentiveId.toHexString())
+    entity.tierIncentive = getTier(event.params.tokensLocked, event.params.incentiveId.toHexString())
     entity.save();
   }
 }
@@ -90,7 +90,7 @@ export function handleTokenUnstaked(event: FarmEnded): void {
 
   if (entity != null) {
     entity.incentive = null; 
-    entity.levelIncentive = BigInt.fromString("0");
+    entity.tierIncentive = BigInt.fromString("0");
     entity.tokensLockedIncentive = BigInt.fromString("0"); 
     entity.save();
   }
@@ -195,15 +195,15 @@ export function handleRewardAmountsDecreased( event: RewardAmountsDecreased): vo
 }
 
 
-function getLevel(amount: BigInt, incentiveId: string): BigInt{
+function getTier(amount: BigInt, incentiveId: string): BigInt{
   let incentive = Incentive.load(incentiveId)
   let res = BigInt.fromString("0")
   if(incentive){
-    if (incentive.tokenAmountForLevel3 <= amount )
+    if (incentive.tokenAmountForTier3 <= amount )
         res = BigInt.fromString("3")
-    else if (incentive.tokenAmountForLevel2 <= amount ) 
+    else if (incentive.tokenAmountForTier2 <= amount ) 
             res = BigInt.fromString("2")
-        else if (incentive.tokenAmountForLevel1 <= amount)
+        else if (incentive.tokenAmountForTier1 <= amount)
               res = BigInt.fromString("1")
   }
   return res 

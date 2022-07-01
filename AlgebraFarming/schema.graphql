@@ -9,12 +9,12 @@ type Incentive @entity {
   reward: BigInt!
   bonusReward: BigInt!
   isDetached: Boolean
-  tokenAmountForLevel1: BigInt!
-  tokenAmountForLevel2: BigInt!
-  tokenAmountForLevel3: BigInt!
-  level1multiplier: BigInt!
-  level2multiplier: BigInt!
-  level3multiplier: BigInt!
+  tokenAmountForTier1: BigInt!
+  tokenAmountForTier2: BigInt!
+  tokenAmountForTier3: BigInt!
+  tier1multiplier: BigInt!
+  tier2multiplier: BigInt!
+  tier3multiplier: BigInt!
   multiplierToken: Bytes!
   enterStartTime: BigInt!
 }
@@ -32,12 +32,12 @@ type EternalFarming @entity {
   rewardRate: BigInt!
   bonusRewardRate: BigInt!
   isDetached: Boolean
-  tokenAmountForLevel1: BigInt!
-  tokenAmountForLevel2: BigInt!
-  tokenAmountForLevel3: BigInt!
-  level1multiplier: BigInt!
-  level2multiplier: BigInt!
-  level3multiplier: BigInt!
+  tokenAmountForTier1: BigInt!
+  tokenAmountForTier2: BigInt!
+  tokenAmountForTier3: BigInt!
+  tier1multiplier: BigInt!
+  tier2multiplier: BigInt!
+  tier3multiplier: BigInt!
   multiplierToken: Bytes!
 }
 
@@ -53,8 +53,8 @@ type Deposit @entity {
   liquidity: BigInt!
   tokensLockedIncentive: BigInt!
   tokensLockedEternal: BigInt!
-  levelIncentive: BigInt!
-  levelEternal: BigInt! 
+  tierIncentive: BigInt!
+  tierEternal: BigInt! 
 }
 
 type Reward @entity{

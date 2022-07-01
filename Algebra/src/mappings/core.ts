@@ -154,8 +154,7 @@ export function handleMint(event: MintEvent): void {
   upperTick.liquidityGross = upperTick.liquidityGross.plus(amount)
   upperTick.liquidityNet = upperTick.liquidityNet.minus(amount)
 
-  // TODO: Update Tick's volume, fees, and liquidity provider count. Computing these on the tick
-  // level requires reimplementing some of the swapping code from v3-core.
+  // TODO: Update Tick's volume, fees, and liquidity provider count
 
   updateAlgebraDayData(event)
   updatePoolDayData(event)
