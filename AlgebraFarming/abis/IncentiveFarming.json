@@ -184,6 +184,62 @@
       },
       {
         "indexed": false,
+        "internalType": "address",
+        "name": "virtualPool",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "startTime",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "endTime",
+        "type": "uint256"
+      }
+    ],
+    "name": "IncentiveDetached",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "incentiveMaker",
+        "type": "address"
+      }
+    ],
+    "name": "IncentiveMaker",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "contract IERC20Minimal",
+        "name": "rewardToken",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "contract IERC20Minimal",
+        "name": "bonusRewardToken",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "contract IAlgebraPool",
+        "name": "pool",
+        "type": "address"
+      },
+      {
+        "indexed": false,
         "internalType": "uint256",
         "name": "startTime",
         "type": "uint256"
@@ -257,63 +313,7 @@
         "type": "uint32"
       }
     ],
-    "name": "IncentiveCreated",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "contract IERC20Minimal",
-        "name": "rewardToken",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "contract IERC20Minimal",
-        "name": "bonusRewardToken",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "contract IAlgebraPool",
-        "name": "pool",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "virtualPool",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "startTime",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "endTime",
-        "type": "uint256"
-      }
-    ],
-    "name": "IncentiveDetached",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "incentiveMaker",
-        "type": "address"
-      }
-    ],
-    "name": "IncentiveMaker",
+    "name": "LimitFarmingCreated",
     "type": "event"
   },
   {
@@ -644,12 +644,12 @@
             "type": "uint32"
           }
         ],
-        "internalType": "struct IAlgebraIncentiveFarming.IncentiveParams",
+        "internalType": "struct IAlgebraLimitFarming.IncentiveParams",
         "name": "params",
         "type": "tuple"
       }
     ],
-    "name": "createIncentive",
+    "name": "createLimitFarming",
     "outputs": [
       {
         "internalType": "address",
@@ -990,16 +990,6 @@
         "internalType": "address",
         "name": "virtualPoolAddress",
         "type": "address"
-      },
-      {
-        "internalType": "uint96",
-        "name": "numberOfFarms",
-        "type": "uint96"
-      },
-      {
-        "internalType": "bool",
-        "name": "isPoolCreated",
-        "type": "bool"
       },
       {
         "internalType": "uint224",

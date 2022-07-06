@@ -1,6 +1,6 @@
 import { ethereum, Address, crypto, store, BigInt } from '@graphprotocol/graph-ts';
 import {
-  IncentiveCreated,
+  EternalFarmingCreated,
   FarmStarted,
   FarmEnded,
   RewardClaimed,
@@ -13,7 +13,7 @@ import {
 import { Deposit, Reward, EternalFarming } from '../types/schema';
 import { createTokenEntity } from '../utils/token'
 
-export function handleIncentiveCreated(event: IncentiveCreated): void {
+export function handleIncentiveCreated(event: EternalFarmingCreated): void {
   let incentiveIdTuple: Array<ethereum.Value> = [
     ethereum.Value.fromAddress(event.params.rewardToken),
     ethereum.Value.fromAddress(event.params.bonusRewardToken),
