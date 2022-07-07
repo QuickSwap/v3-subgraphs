@@ -2,8 +2,8 @@
   {
     "inputs": [
       {
-        "internalType": "contract IAlgebraIncentiveFarming",
-        "name": "_farming",
+        "internalType": "contract IAlgebraLimitFarming",
+        "name": "_limitFarming",
         "type": "address"
       },
       {
@@ -463,56 +463,11 @@
         "internalType": "uint256",
         "name": "tokensLocked",
         "type": "uint256"
-      }
-    ],
-    "name": "enterEternalFarming",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "components": [
-          {
-            "internalType": "contract IERC20Minimal",
-            "name": "rewardToken",
-            "type": "address"
-          },
-          {
-            "internalType": "contract IERC20Minimal",
-            "name": "bonusRewardToken",
-            "type": "address"
-          },
-          {
-            "internalType": "contract IAlgebraPool",
-            "name": "pool",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "startTime",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "endTime",
-            "type": "uint256"
-          }
-        ],
-        "internalType": "struct IIncentiveKey.IncentiveKey",
-        "name": "key",
-        "type": "tuple"
       },
       {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "tokensLocked",
-        "type": "uint256"
+        "internalType": "bool",
+        "name": "isLimit",
+        "type": "bool"
       }
     ],
     "name": "enterFarming",
@@ -571,69 +526,16 @@
         "internalType": "uint256",
         "name": "tokenId",
         "type": "uint256"
-      }
-    ],
-    "name": "exitEternalFarming",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "components": [
-          {
-            "internalType": "contract IERC20Minimal",
-            "name": "rewardToken",
-            "type": "address"
-          },
-          {
-            "internalType": "contract IERC20Minimal",
-            "name": "bonusRewardToken",
-            "type": "address"
-          },
-          {
-            "internalType": "contract IAlgebraPool",
-            "name": "pool",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "startTime",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "endTime",
-            "type": "uint256"
-          }
-        ],
-        "internalType": "struct IIncentiveKey.IncentiveKey",
-        "name": "key",
-        "type": "tuple"
       },
       {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
+        "internalType": "bool",
+        "name": "isLimit",
+        "type": "bool"
       }
     ],
     "name": "exitFarming",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "farming",
-    "outputs": [
-      {
-        "internalType": "contract IAlgebraIncentiveFarming",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -735,6 +637,19 @@
         "internalType": "uint256",
         "name": "tokenId",
         "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "limitFarming",
+    "outputs": [
+      {
+        "internalType": "contract IAlgebraLimitFarming",
+        "name": "",
+        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -1135,7 +1050,7 @@
     "outputs": [
       {
         "internalType": "address",
-        "name": "incentiveVP",
+        "name": "limitVP",
         "type": "address"
       },
       {

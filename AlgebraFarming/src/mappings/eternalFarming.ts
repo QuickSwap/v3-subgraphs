@@ -1,7 +1,7 @@
-import { ethereum, Address, crypto, store, BigInt } from '@graphprotocol/graph-ts';
+import { ethereum, crypto, BigInt } from '@graphprotocol/graph-ts';
 import {
   EternalFarmingCreated,
-  FarmStarted,
+  FarmEntered,
   FarmEnded,
   RewardClaimed,
   IncentiveDetached,
@@ -10,6 +10,7 @@ import {
   RewardsAdded,
   RewardsCollected
 } from '../types/EternalFarming/EternalFarming';
+import { FarmEntered } from '../types/LimitFarming/LimitFarming';
 import { Deposit, Reward, EternalFarming } from '../types/schema';
 import { createTokenEntity } from '../utils/token'
 
@@ -51,15 +52,15 @@ export function handleIncentiveCreated(event: EternalFarmingCreated): void {
   entity.tokenAmountForTier1 = event.params.tiers.tokenAmountForTier1;
   entity.tokenAmountForTier2 = event.params.tiers.tokenAmountForTier2;
   entity.tokenAmountForTier3 = event.params.tiers.tokenAmountForTier3;
-  entity.tier1multiplier = event.params.tiers.tier1multiplier;
-  entity.tier2multiplier = event.params.tiers.tier2multiplier;
-  entity.tier3multiplier = event.params.tiers.tier3multiplier;
+  entity.tier1Multiplier = event.params.tiers.tier1Multiplier;
+  entity.tier2Multiplier = event.params.tiers.tier2Multiplier;
+  entity.tier3Multiplier = event.params.tiers.tier3Multiplier;
   entity.multiplierToken = event.params.multiplierToken;
   entity.save();
 }
 
 
-export function handleTokenStaked(event: FarmStarted): void {
+export function handleTokenStaked(event: FarmEntered): void {
   let entity = Deposit.load(event.params.tokenId.toString());
   if (entity != null) {
     entity.eternalFarming = event.params.incentiveId;

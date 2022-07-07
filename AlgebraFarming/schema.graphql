@@ -1,4 +1,4 @@
-type Incentive @entity {
+type LimitFarming @entity {
   id: ID!
   createdAtTimestamp: BigInt!
   rewardToken: Bytes!
@@ -12,9 +12,9 @@ type Incentive @entity {
   tokenAmountForTier1: BigInt!
   tokenAmountForTier2: BigInt!
   tokenAmountForTier3: BigInt!
-  tier1multiplier: BigInt!
-  tier2multiplier: BigInt!
-  tier3multiplier: BigInt!
+  tier1Multiplier: BigInt!
+  tier2Multiplier: BigInt!
+  tier3Multiplier: BigInt!
   multiplierToken: Bytes!
   enterStartTime: BigInt!
 }
@@ -35,9 +35,9 @@ type EternalFarming @entity {
   tokenAmountForTier1: BigInt!
   tokenAmountForTier2: BigInt!
   tokenAmountForTier3: BigInt!
-  tier1multiplier: BigInt!
-  tier2multiplier: BigInt!
-  tier3multiplier: BigInt!
+  tier1Multiplier: BigInt!
+  tier2Multiplier: BigInt!
+  tier3Multiplier: BigInt!
   multiplierToken: Bytes!
 }
 
@@ -47,13 +47,13 @@ type Deposit @entity {
   owner: Bytes!
   onFarmingCenter: Boolean!
   pool: Bytes!
-  incentive: Bytes
+  limitFarming: Bytes
   eternalFarming: Bytes
   enteredInEternalFarming: BigInt 
   liquidity: BigInt!
-  tokensLockedIncentive: BigInt!
+  tokensLockedLimit: BigInt!
   tokensLockedEternal: BigInt!
-  tierIncentive: BigInt!
+  tierLimit: BigInt!
   tierEternal: BigInt! 
 }
 

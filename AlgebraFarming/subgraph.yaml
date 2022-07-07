@@ -17,6 +17,7 @@ dataSources:
       file: ./src/mappings/position-manager.ts
       entities:
         - Deposit
+        - Token
       abis:
         - name: NonfungiblePositionManager
           file: ./abis/NonfungiblePositionManager.json
@@ -42,14 +43,13 @@ dataSources:
       language: wasm/assemblyscript
       file: ./src/mappings/eternalFarming.ts
       entities:
-        - DepositTransferred
-        - IncentiveCreated
-        - RewardClaimed
-        - FarmStarted
-        - FarmEnded
+        - Deposit
+        - Token
+        - EternalFarming
+        - Reward
       abis:
         - name: EternalFarming
-          file: ./abis/EternalFarmingABI.json
+          file: ./abis/EternalFarming.json
         - name: ERC20
           file: ./abis/ERC20.json
         - name: ERC20SymbolBytes
@@ -61,7 +61,7 @@ dataSources:
           handler: handleIncentiveCreated
         - event: RewardClaimed(indexed address,uint256,indexed address,indexed address)
           handler: handleRewardClaimed
-        - event: FarmStarted(indexed uint256,indexed bytes32,uint128,uint256)
+        - event: FarmEntered(indexed uint256,indexed bytes32,uint128,uint256)
           handler: handleTokenStaked
         - event: FarmEnded(indexed uint256,indexed bytes32,indexed address,address,address,uint256,uint256)
           handler: handleTokenUnstaked
@@ -88,11 +88,8 @@ dataSources:
       language: wasm/assemblyscript
       file: ./src/mappings/center.ts
       entities:
-        - DepositTransferred
-        - IncentiveCreated
-        - RewardClaimed
-        - FarmStarted
-        - FarmEnded
+        - Deposit
+        - Token
       abis:
         - name: FarmingCenter
           file: ./abis/FarmingCenter.json
@@ -102,26 +99,25 @@ dataSources:
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransfer
 - kind: ethereum/contract
-  name: IncentiveFarming
+  name: LimitFarming
   network: chapel
   source:
       address: '0x9A8D7617ABa2BCcdABC7CedE037759a28315943B'
-      abi: IncentiveFarming
+      abi: LimitFarming
       startBlock: 20820087 
   mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript 
-      file: ./src/mappings/incentiveFarming.ts
+      file: ./src/mappings/limitFarming.ts
       entities:
-        - DepositTransferred
-        - IncentiveCreated
-        - RewardClaimed
-        - FarmStarted
-        - FarmEnded
+        - Deposit
+        - Token
+        - LimitFarming
+        - Reward
       abis:
-        - name: IncentiveFarming
-          file: ./abis/IncentiveFarming.json
+        - name: LimitFarming
+          file: ./abis/LimitFarming.json
         - name: ERC20
           file: ./abis/ERC20.json
       eventHandlers:
@@ -129,7 +125,7 @@ dataSources:
           handler: handleIncentiveCreated
         - event: RewardClaimed(indexed address,uint256,indexed address,indexed address)
           handler: handleRewardClaimed
-        - event: FarmStarted(indexed uint256,indexed bytes32,uint128,uint256)
+        - event: FarmEntered(indexed uint256,indexed bytes32,uint128,uint256)
           handler: handleTokenStaked
         - event: FarmEnded(indexed uint256,indexed bytes32,indexed address,address,address,uint256,uint256)
           handler: handleTokenUnstaked

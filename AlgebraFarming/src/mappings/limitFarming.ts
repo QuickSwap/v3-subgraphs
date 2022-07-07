@@ -1,15 +1,16 @@
 import { ethereum, crypto, BigInt} from '@graphprotocol/graph-ts';
+import { FarmEntered } from '../types/EternalFarming/EternalFarming';
 import {
   LimitFarmingCreated,
-  FarmStarted,
+  FarmEntered,
   FarmEnded,
   RewardClaimed,  
   IncentiveDetached,
   IncentiveAttached,
   RewardsAdded,
   RewardAmountsDecreased
-} from '../types/IncentiveFarming/IncentiveFarming';
-import { Incentive, Deposit, Reward} from '../types/schema';
+} from '../types/LimitFarming/LimitFarming';
+import { LimitFarming, Deposit, Reward} from '../types/schema';
 import { createTokenEntity } from '../utils/token';
 
 
@@ -34,9 +35,9 @@ export function handleIncentiveCreated(event: LimitFarmingCreated): void {
   )!;
   let incentiveId = crypto.keccak256(incentiveIdEncoded);
 
-  let entity = Incentive.load(incentiveId.toHex()); 
+  let entity = LimitFarming.load(incentiveId.toHex()); 
   if (entity == null) {
-    entity = new Incentive(incentiveId.toHex());
+    entity = new LimitFarming(incentiveId.toHex());
     entity.reward = BigInt.fromString("0");
     entity.bonusReward = BigInt.fromString("0");
   }
@@ -52,9 +53,9 @@ export function handleIncentiveCreated(event: LimitFarmingCreated): void {
   entity.tokenAmountForTier1 = event.params.tiers.tokenAmountForTier1
   entity.tokenAmountForTier2 = event.params.tiers.tokenAmountForTier2
   entity.tokenAmountForTier3 = event.params.tiers.tokenAmountForTier3
-  entity.tier1multiplier = event.params.tiers.tier1multiplier
-  entity.tier2multiplier = event.params.tiers.tier2multiplier
-  entity.tier3multiplier = event.params.tiers.tier3multiplier
+  entity.tier1Multiplier = event.params.tiers.tier1Multiplier
+  entity.tier2Multiplier = event.params.tiers.tier2Multiplier
+  entity.tier3Multiplier = event.params.tiers.tier3Multiplier
   entity.multiplierToken = event.params.multiplierToken
   entity.enterStartTime = event.params.enterStartTime
 
@@ -63,12 +64,12 @@ export function handleIncentiveCreated(event: LimitFarmingCreated): void {
 }
 
 
-export function handleTokenStaked(event: FarmStarted): void {
+export function handleTokenStaked(event: FarmEntered): void {
   let entity = Deposit.load(event.params.tokenId.toString());
   if (entity != null) {
-    entity.incentive = event.params.incentiveId;
-    entity.tokensLockedIncentive = event.params.tokensLocked;
-    entity.tierIncentive = getTier(event.params.tokensLocked, event.params.incentiveId.toHexString())
+    entity.limitFarming = event.params.incentiveId;
+    entity.tokensLockedLimit = event.params.tokensLocked;
+    entity.tierLimit = getTier(event.params.tokensLocked, event.params.incentiveId.toHexString())
     entity.save();
   }
 }
@@ -89,9 +90,9 @@ export function handleTokenUnstaked(event: FarmEnded): void {
   let entity = Deposit.load(event.params.tokenId.toString());
 
   if (entity != null) {
-    entity.incentive = null; 
-    entity.tierIncentive = BigInt.fromString("0");
-    entity.tokensLockedIncentive = BigInt.fromString("0"); 
+    entity.limitFarming = null; 
+    entity.tierLimit = BigInt.fromString("0");
+    entity.tokensLockedLimit = BigInt.fromString("0"); 
     entity.save();
   }
 
@@ -141,7 +142,7 @@ export function handleDetached( event: IncentiveDetached): void{
   )!;
   let incentiveId = crypto.keccak256(incentiveIdEncoded);
 
-  let entity = Incentive.load(incentiveId.toHex());
+  let entity = LimitFarming.load(incentiveId.toHex());
 
   if(entity){
     entity.isDetached = true
@@ -167,7 +168,7 @@ export function handleAttached( event: IncentiveAttached): void{
   )!;
   let incentiveId = crypto.keccak256(incentiveIdEncoded);
 
-  let entity = Incentive.load(incentiveId.toHex());
+  let entity = LimitFarming.load(incentiveId.toHex());
 
   if(entity){
     entity.isDetached = false
@@ -177,7 +178,7 @@ export function handleAttached( event: IncentiveAttached): void{
 }
 
 export function handleRewardsAdded( event: RewardsAdded): void{
-  let incentive = Incentive.load(event.params.incentiveId.toHexString())
+  let incentive = LimitFarming.load(event.params.incentiveId.toHexString())
   if(incentive){
     incentive.bonusReward += event.params.bonusRewardAmount
     incentive.reward += event.params.rewardAmount
@@ -186,7 +187,7 @@ export function handleRewardsAdded( event: RewardsAdded): void{
 } 
 
 export function handleRewardAmountsDecreased( event: RewardAmountsDecreased): void {
-  let incentive = Incentive.load(event.params.incentiveId.toHexString())
+  let incentive = LimitFarming.load(event.params.incentiveId.toHexString())
   if(incentive){
     incentive.bonusReward -= event.params.bonusReward
     incentive.reward -= event.params.reward
@@ -196,7 +197,7 @@ export function handleRewardAmountsDecreased( event: RewardAmountsDecreased): vo
 
 
 function getTier(amount: BigInt, incentiveId: string): BigInt{
-  let incentive = Incentive.load(incentiveId)
+  let incentive = LimitFarming.load(incentiveId)
   let res = BigInt.fromString("0")
   if(incentive){
     if (incentive.tokenAmountForTier3 <= amount )
