@@ -21,7 +21,7 @@ $ yarn graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.t
 
 ## AlgebraFarming
 
-Update FarmingCenterAddress and IncentiveFarmingAddress in AlgebraFarming/src/utils/constants.ts
+Update FarmingCenterAddress in AlgebraFarming/src/utils/constants.ts
 ```
 $ yarn
 $ yarn codegen

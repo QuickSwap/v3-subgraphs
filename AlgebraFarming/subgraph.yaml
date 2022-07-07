@@ -7,7 +7,7 @@ dataSources:
   name: NonfungiblePositionManager
   network: chapel
   source:
-      address: '0xE179186e1e5CC1a12B5ccb736e89Cdc3ACee53Ff'
+      address: '0xBD3E52753B7140921cfC143B8a2369E17717B7ff'
       abi: NonfungiblePositionManager
       startBlock: 20820087
   mapping:
@@ -34,7 +34,7 @@ dataSources:
   name: EternalFarming
   network: chapel
   source:
-      address: '0x5955C099223CD99034822CF7FEdf3C5FfF064e0A'
+      address: '0x466C8771Efd889c6Baf7f5431630740aE1B06E8C'
       abi: EternalFarming
       startBlock: 20820087
   mapping:
@@ -79,7 +79,7 @@ dataSources:
   name: FarmingCenter
   network: chapel
   source:
-      address: '0xB9d11A25D4A56D2565fc676af8ABd6f132F35c91'
+      address: '0x2BDD3fC1FF7964Dc4f8BE50C76236BA00B25205c'
       abi: FarmingCenter
       startBlock: 20820087
   mapping:
@@ -102,7 +102,7 @@ dataSources:
   name: LimitFarming
   network: chapel
   source:
-      address: '0x9A8D7617ABa2BCcdABC7CedE037759a28315943B'
+      address: '0x468E7445F0baAfE8Bc81e2fe4E6D1EF2bB88500E'
       abi: LimitFarming
       startBlock: 20820087 
   mapping:
