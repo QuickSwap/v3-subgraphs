@@ -199,7 +199,11 @@ export function handleRewardAmountsDecreased( event: RewardAmountsDecreased): vo
 function getTier(amount: BigInt, incentiveId: string): BigInt{
   let incentive = LimitFarming.load(incentiveId)
   let res = BigInt.fromString("0")
+  const MIN_MULTIPLIER = BigInt.fromString("10000")
   if(incentive){
+    if (incentive.tier1Multiplier == MIN_MULTIPLIER && incentive.tier2Multiplier == MIN_MULTIPLIER && incentive.tier3Multiplier == MIN_MULTIPLIER){
+      return res
+    }
     if (incentive.tokenAmountForTier3 <= amount )
         res = BigInt.fromString("3")
     else if (incentive.tokenAmountForTier2 <= amount ) 
