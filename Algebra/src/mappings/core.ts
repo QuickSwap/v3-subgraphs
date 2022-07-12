@@ -1,7 +1,7 @@
 /* eslint-disable prefer-const */
 import { Bundle, Burn, Factory, Mint, Pool, Swap, Tick, Token,PoolFeeData } from '../types/schema'
 import { Pool as PoolABI } from '../types/Factory/Pool'
-import { BigDecimal, BigInt, ethereum} from '@graphprotocol/graph-ts'
+import { BigDecimal, BigInt, ethereum, log} from '@graphprotocol/graph-ts'
 
 import {
   Burn as BurnEvent,
@@ -445,6 +445,7 @@ export function handleSwap(event: SwapEvent): void {
   swap.token1 = pool.token1
   swap.sender = event.params.sender
   swap.origin = event.transaction.from
+  swap.liquidity = event.params.liquidity
   swap.recipient = event.params.recipient
   swap.amount0 = amount0
   swap.amount1 = amount1
@@ -646,6 +647,7 @@ function updateTickFeeVarsAndSave(tick: Tick, event: ethereum.Event): void {
   let poolAddress = event.address
   // not all ticks are initialized so obtaining null is expected behavior
   let poolContract = PoolABI.bind(poolAddress)
+  log.warning("{}",[tick.tickIdx.toString()])
   let tickResult = poolContract.ticks(tick.tickIdx.toI32())
   tick.feeGrowthOutside0X128 = tickResult.value2
   tick.feeGrowthOutside1X128 = tickResult.value3

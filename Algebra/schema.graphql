@@ -375,6 +375,8 @@ type Swap @entity {
   sender: Bytes!
   # recipient of the swap
   recipient: Bytes!
+  # liquidity after swap
+  liquidity: BigInt!
   # txn origin
   origin: Bytes! # the EOA that initiated the txn
   # delta of token0 swapped
