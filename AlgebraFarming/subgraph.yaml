@@ -23,6 +23,10 @@ dataSources:
           file: ./abis/NonfungiblePositionManager.json
         - name: ERC20
           file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
       eventHandlers:
         - event: IncreaseLiquidity(indexed uint256,uint128,uint128,uint256,uint256,address)
           handler: handleIncreaseLiquidity
@@ -95,6 +99,10 @@ dataSources:
           file: ./abis/FarmingCenter.json
         - name: ERC20
           file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransfer
@@ -120,6 +128,10 @@ dataSources:
           file: ./abis/LimitFarming.json
         - name: ERC20
           file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
       eventHandlers:
         - event: LimitFarmingCreated(indexed address,indexed address,indexed address,uint256,uint256,uint256,uint256,(uint256,uint256,uint256,uint32,uint32,uint32),address,uint32)
           handler: handleIncentiveCreated
