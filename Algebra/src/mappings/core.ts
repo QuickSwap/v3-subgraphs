@@ -647,7 +647,7 @@ function updateTickFeeVarsAndSave(tick: Tick, event: ethereum.Event): void {
   let poolAddress = event.address
   // not all ticks are initialized so obtaining null is expected behavior
   let poolContract = PoolABI.bind(poolAddress)
-  log.warning("{}",[tick.tickIdx.toString()])
+
   let tickResult = poolContract.ticks(tick.tickIdx.toI32())
   tick.feeGrowthOutside0X128 = tickResult.value2
   tick.feeGrowthOutside1X128 = tickResult.value3
