@@ -7,6 +7,8 @@
 Update FACTORY_ADDRESS in Algebra/src/utils/constants.ts
 
 Update USDC_WMatic_03_POOL,  WHITELIST_TOKENS and STABLE_COINS in Algebra/src/utils/pricing.ts 
+Update network, startBlock and addresses in subgraph.yaml
+
 ```
 $ yarn
 $ yarn codegen
@@ -22,6 +24,8 @@ $ yarn graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.t
 ## AlgebraFarming
 
 Update FarmingCenterAddress in AlgebraFarming/src/utils/constants.ts
+Update network, startBlock and addresses in subgraph.yaml
+
 ```
 $ yarn
 $ yarn codegen
