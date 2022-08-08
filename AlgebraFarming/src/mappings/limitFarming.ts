@@ -47,6 +47,7 @@ export function handleIncentiveCreated(event: LimitFarmingCreated): void {
   entity.pool = event.params.pool;
   entity.startTime = event.params.startTime;
   entity.endTime = event.params.endTime;
+  entity.minRangeLength = BigInt.fromI32(event.params.minimalAllowedPositionWidth)
   entity.reward += event.params.reward;
   entity.bonusReward += event.params.bonusReward;
   entity.createdAtTimestamp = event.block.timestamp;

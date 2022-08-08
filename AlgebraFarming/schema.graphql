@@ -9,6 +9,7 @@ type LimitFarming @entity {
   reward: BigInt!
   bonusReward: BigInt!
   isDetached: Boolean
+  minRangeLength: BigInt!
   tokenAmountForTier1: BigInt!
   tokenAmountForTier2: BigInt!
   tokenAmountForTier3: BigInt!
@@ -32,6 +33,7 @@ type EternalFarming @entity {
   rewardRate: BigInt!
   bonusRewardRate: BigInt!
   isDetached: Boolean
+  minRangeLength: BigInt!
   tokenAmountForTier1: BigInt!
   tokenAmountForTier2: BigInt!
   tokenAmountForTier3: BigInt!
@@ -51,6 +53,7 @@ type Deposit @entity {
   eternalFarming: Bytes
   enteredInEternalFarming: BigInt 
   liquidity: BigInt!
+  rangeLength: BigInt!
   tokensLockedLimit: BigInt!
   tokensLockedEternal: BigInt!
   tierLimit: BigInt!

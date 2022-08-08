@@ -49,6 +49,7 @@ export function handleIncentiveCreated(event: EternalFarmingCreated): void {
   entity.startTime = event.params.startTime;
   entity.endTime = event.params.endTime;
   entity.isDetached = false;
+  entity.minRangeLength = BigInt.fromI32(event.params.minimalAllowedPositionWidth)
   entity.tokenAmountForTier1 = event.params.tiers.tokenAmountForTier1;
   entity.tokenAmountForTier2 = event.params.tiers.tokenAmountForTier2;
   entity.tokenAmountForTier3 = event.params.tiers.tokenAmountForTier3;
