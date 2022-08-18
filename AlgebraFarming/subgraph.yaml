@@ -5,11 +5,11 @@ schema:
 dataSources:
 - kind: ethereum/contract
   name: NonfungiblePositionManager
-  network: matic
+  network: dogechain
   source:
-      address: '0x5c43b3C6d5b7dF8A672db8DD66d0b5D74BAf099F'
+      address: '0xBF4B86A53E4f0Bf2EEEe083820f0f1c2363DF157'
       abi: NonfungiblePositionManager
-      startBlock: 31656556
+      startBlock: 100000
   mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -36,11 +36,11 @@ dataSources:
           handler: handleDecreaseLiquidity
 - kind: ethereum/contract
   name: EternalFarming
-  network: matic
+  network: dogechain
   source:
-      address: '0xA55A63c7f3860d8E1D1cdb41D426B2841CD21F95'
+      address: '0xA8dca28065cDA20d92a8fD6F560da6F72640fCac'
       abi: EternalFarming
-      startBlock: 31656556
+      startBlock: 100000
   mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -81,11 +81,11 @@ dataSources:
           handler: handleCollect
 - kind: ethereum/contract
   name: FarmingCenter
-  network: matic
+  network: dogechain
   source:
-      address: '0xB1d4784473277c162E36656fa066dfEd21B1EC89'
+      address: '0x3A1017b5C8e5bb5B768A7f39548C0D528a9bE115'
       abi: FarmingCenter
-      startBlock: 31656556
+      startBlock: 100000
   mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -108,11 +108,11 @@ dataSources:
           handler: handleTransfer
 - kind: ethereum/contract
   name: LimitFarming
-  network: matic
+  network: dogechain
   source:
-      address: '0x210F88228151992357Aea0e2fb7f3dE9D8eC8537'
+      address: '0xdA323D105970Fe5bCD0E480a27D4bbD04Ae8dCa9'
       abi: LimitFarming
-      startBlock: 31656556 
+      startBlock: 100000 
   mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
