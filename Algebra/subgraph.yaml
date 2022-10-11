@@ -7,9 +7,9 @@ dataSources:
     name: Factory
     network: dogechain
     source:
-      address: '0xe18efa058A8C8170fa82b00562FaDb1Ce3855419'
+      address: '0xd2480162aa7f02ead7bf4c127465446150d58452'
       abi: Factory
-      startBlock: 100000
+      startBlock: 737574
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -36,9 +36,9 @@ dataSources:
     name: NonfungiblePositionManager
     network: dogechain
     source:
-      address: '0xBF4B86A53E4f0Bf2EEEe083820f0f1c2363DF157'
+      address: '0x0b012055f770ae7bb7a8303968a7fb6088a2296e'
       abi: NonfungiblePositionManager
-      startBlock: 100000
+      startBlock: 737574
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
