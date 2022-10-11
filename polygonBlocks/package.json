@@ -13,8 +13,8 @@
     "deploy-goerli": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ blocklytics/goerli-blocks",
     "deploy-ropsten": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ blocklytics/ropsten-blocks",
     "deploy-poa": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ blocklytics/poa-core-blocks",
-    "create-dogechain": "graph create quickswap/dogechain-blocklytics --node <graph node url>",
-    "deploy-dogechain": "graph deploy quickswap/dogechain-blocklytics --debug --ipfs <ipfs url> --node <graph node url>"
+    "create-dogechain": "graph create quickswap/dogechain-blocklytics --node http://103.209.147.116:8020/",
+    "deploy-dogechain": "graph deploy quickswap/dogechain-blocklytics --debug --ipfs http://103.209.147.116:5001 --node http://103.209.147.116:8020/"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "^0.17.1",
