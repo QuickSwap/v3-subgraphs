@@ -22,7 +22,7 @@ export let WHITELIST_TOKENS: string[] = [
   '0xd6df932a45c0f255f85145f286ea0b292b21c90b', //AAVE
 ]
 
-let MINIMUM_Matic_LOCKED = BigDecimal.fromString('0')
+let MINIMUM_Matic_LOCKED = BigDecimal.fromString('800')
 
 let Q192 = Math.pow(2, 192)
 
@@ -48,7 +48,7 @@ export function priceToTokenPrices(price: BigInt, token0: Token, token1: Token):
 export function getEthPriceInUSD(): BigDecimal {
   let usdcPool = Pool.load(USDC_WMatic_03_POOL) // dai is token0
   if (usdcPool !== null) {
-    return usdcPool.token0Price
+    return usdcPool.token1Price
   } else {
     return ZERO_BD
   }
