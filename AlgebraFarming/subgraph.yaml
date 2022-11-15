@@ -112,7 +112,7 @@ dataSources:
   source:
       address: '0x481FcFa00Ee6b2384FF0B3c3b5b29aD911c1AAA7'
       abi: LimitFarming
-      startBlock: 737574 
+      startBlock: 4000000 
   mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
