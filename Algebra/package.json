@@ -9,8 +9,9 @@
     "build": "graph build",
     "create-local": "graph create cryptoalgebra/algebra --node http://127.0.0.1:8020",
     "deploy-local": "graph deploy cryptoalgebra/algebra --debug --ipfs http://localhost:5001 --node http://127.0.0.1:8020",
-    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ --access-token c10312607d56464ab8c212f021e3720f sameepsi/quickswap-v3 subgraph.yaml",
-    "deploy-dev": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/  --access-token a3f47169869d4585a475d0d1d10a4062 iliaazhel/fuzzyswap subgraph.yaml",
+    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ --access-token <> sameepsi/quickswap-v3 subgraph.yaml",
+    "deploy-01": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ --access-token <> sameepsi/quickswapv3-02 subgraph.yaml",
+    "deploy-dev": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/  --access-token <> iliaazhel/fuzzyswap subgraph.yaml",
     "create": "graph create cryptoalgebra/info --node https://api.thegraph.com/create/"
   },
   "devDependencies": {
