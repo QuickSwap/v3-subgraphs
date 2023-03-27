@@ -4,32 +4,22 @@ import { Bundle, Pool, Token } from './../types/schema'
 import { BigDecimal, BigInt } from '@graphprotocol/graph-ts'
 import { exponentToBigDecimal, safeDiv } from '../utils/index'
 
-const WMatic_ADDRESS = '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270'
-const USDC_WMatic_03_POOL = '0xae81fac689a1b4b1e06e7ef4a2ab4cd8ac0a087d'
+const WMatic_ADDRESS = '0x5757371414417b8C6CAad45bAeF941aBc7d3Ab32'//WETH
+const USDC_WMatic_03_POOL = '0xa124e0c4f2b9509aa6fc584365e9688377aa427a'//WETH-USDT pool
 
 // token where amounts should contribute to tracked volume and liquidity
 // usually tokens that many tokens are paired with s
 export let WHITELIST_TOKENS: string[] = [
-  '0x7ceb23fd6bc0add59e62ac25578270cff1b9f619', // WETH
-  '0x2791bca1f2de4661ed88a30c99a7a9449aa84174', // USDC
-  '0x831753dd7087cac61ab5644b308642cc1c33dc13', //QUICK
-  '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270', //WMATIC
-  '0x1bfd67037b42cf73acf2047067bd4f2c47d9bfd6', //WBTC
-  '0x8f3cf7ad23cd3cadbd9735aff958023239c6a063', // DAI
-  '0xc2132d05d31c914a87c6611c10748aeb04b58e8f', // USDT
-  '0x9719d867a500ef117cc201206b8ab51e794d3f82', //MAUSDC
-  '0x104592a158490a9228070e0a8e5343b499e125d0', //FRAX
-  '0xd6df932a45c0f255f85145f286ea0b292b21c90b', //AAVE
+  '0x5757371414417b8C6CAad45bAeF941aBc7d3Ab32', // WETH
+  '0x7379a261bC347BDD445484A91648Abf4A2BDEe5E', // USDT
 ]
 
-let MINIMUM_Matic_LOCKED = BigDecimal.fromString('800')
+let MINIMUM_Matic_LOCKED = BigDecimal.fromString('1')
 
 let Q192 = Math.pow(2, 192)
 
 let STABLE_COINS: string[] = [
-  '0x2791bca1f2de4661ed88a30c99a7a9449aa84174', // USDC
-  '0xc2132d05d31c914a87c6611c10748aeb04b58e8f', // USDT
-  '0x8f3cf7ad23cd3cadbd9735aff958023239c6a063', //DAI
+  '0x7379a261bC347BDD445484A91648Abf4A2BDEe5E', // USDT
 ]
 
 

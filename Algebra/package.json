@@ -7,8 +7,8 @@
   "scripts": {
     "codegen": "graph codegen --output-dir src/types/",
     "build": "graph build",
-    "create-local": "graph create cryptoalgebra/algebra --node http://127.0.0.1:8020",
-    "deploy-local": "graph deploy cryptoalgebra/algebra --debug --ipfs http://localhost:5001 --node http://127.0.0.1:8020",
+    "create-local": "graph create quickswap/v3 --node http://127.0.0.1:8020",
+    "deploy-local": "graph deploy quickswap/v3 --debug --ipfs http://localhost:5001 --node http://127.0.0.1:8020",
     "deploy": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ --access-token <> sameepsi/quickswap-v3 subgraph.yaml",
     "deploy-01": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ --access-token <> sameepsi/quickswapv3-02 subgraph.yaml",
     "deploy-dev": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/  --access-token <> iliaazhel/fuzzyswap subgraph.yaml",
